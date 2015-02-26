@@ -7,6 +7,18 @@ import org.junit.Test;
 public class BytesTest {
 
   @Test
+  public void intToBytes() {
+    // 1011 1010 1010 1011 0001 0000 0000 0001
+    byte[] expected = new byte[] {
+      (byte)0xba,
+      (byte)0xab,
+      (byte)0x10,
+      (byte)0x01
+    };
+    assertArrayEquals(expected, Bytes.intToBytes(-1163194367));
+  }
+
+  @Test
   public void byteToInt() {
     assertEquals(0, Bytes.byteToInt((byte) 0));
     assertEquals(1, Bytes.byteToInt((byte) 1));
