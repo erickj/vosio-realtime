@@ -79,4 +79,48 @@ public class MessageTest {
     attrBytes[0] = 0;
     assertEquals(0x14, m.getAttributeBytes()[0]);
   }
+
+  @Test
+  public void getMessageClass_request() {
+    Message request = new Message(
+        hexToBytes("000100000000000000000000000000000000000000000000"));
+    assertEquals(Messages.MESSAGE_CLASS_REQUEST, request.getMessageClass());
+  }
+
+  @Test
+  public void getMessageClass_indication() {
+    Message indication = new Message(
+        hexToBytes("001100000000000000000000000000000000000000000000"));
+    assertEquals(
+        Messages.MESSAGE_CLASS_INDICATION, indication.getMessageClass());
+  }
+
+  @Test
+  public void getMessageClass_succesResponse() {
+    Message response = new Message(
+        hexToBytes("010100000000000000000000000000000000000000000000"));
+    assertEquals(Messages.MESSAGE_CLASS_RESPONSE, response.getMessageClass());
+  }
+
+  @Test
+  public void getMessageClass_errorResponse() {
+    Message errorResponse = new Message(
+        hexToBytes("011100000000000000000000000000000000000000000000"));
+    assertEquals(
+        Messages.MESSAGE_CLASS_ERROR_RESPONSE, errorResponse.getMessageClass());
+  }
+
+  @Test
+  public void getMessageMethod_binding() {
+    Message binding = new Message(
+        hexToBytes("010100000000000000000000000000000000000000000000"));
+    assertEquals(Messages.MESSAGE_METHOD_BINDING, binding.getMessageMethod());
+  }
+
+  @Test
+  public void getMessageMethod_allocate() {
+    Message allocate = new Message(
+        hexToBytes("010300000000000000000000000000000000000000000000"));
+    assertEquals(Messages.MESSAGE_METHOD_ALLOCATE, allocate.getMessageMethod());
+  }
 }
