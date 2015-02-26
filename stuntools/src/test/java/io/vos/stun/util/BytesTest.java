@@ -20,16 +20,16 @@ public class BytesTest {
 
   @Test
   public void twoBytesToInt() {
-    assertEquals(0, Bytes.twoBytesToInt(new byte[] {0x00, 0x00}));
-    assertEquals(1, Bytes.twoBytesToInt(new byte[] {0x00, 0x01}));
-    assertEquals(10, Bytes.twoBytesToInt(new byte[] {0x00, 0x0a}));
-    assertEquals(15, Bytes.twoBytesToInt(new byte[] {0x00, 0x0f}));
-    assertEquals(255, Bytes.twoBytesToInt(new byte[] {0x00, (byte)0xff}));
+    assertEquals(0, Bytes.twoBytesToInt((byte)0x00, (byte)0x00));
+    assertEquals(1, Bytes.twoBytesToInt((byte)0x00, (byte)0x01));
+    assertEquals(10, Bytes.twoBytesToInt((byte)0x00, (byte)0x0a));
+    assertEquals(15, Bytes.twoBytesToInt((byte)0x00, (byte)0x0f));
+    assertEquals(255, Bytes.twoBytesToInt((byte)0x00, (byte)0xff));
 
-    assertEquals(256, Bytes.twoBytesToInt(new byte[] {0x01, (byte)0x00}));
-    assertEquals(257, Bytes.twoBytesToInt(new byte[] {0x01, (byte)0x01}));
+    assertEquals(256, Bytes.twoBytesToInt((byte)0x01, (byte)0x00));
+    assertEquals(257, Bytes.twoBytesToInt((byte)0x01, (byte)0x01));
 
-    assertEquals(65534, Bytes.twoBytesToInt(new byte[] {(byte)0xff, (byte)0xfe}));
-    assertEquals(65535, Bytes.twoBytesToInt(new byte[] {(byte)0xff, (byte)0xff}));
+    assertEquals(65534, Bytes.twoBytesToInt((byte)0xff, (byte)0xfe));
+    assertEquals(65535, Bytes.twoBytesToInt((byte)0xff, (byte)0xff));
   }
 }
