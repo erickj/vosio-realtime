@@ -1,0 +1,35 @@
+package io.vos.stun.util;
+
+import static org.junit.Assert.*;
+
+import org.junit.Test;
+
+public class BytesTest {
+
+  @Test
+  public void byteToInt() {
+    assertEquals(0, Bytes.byteToInt((byte) 0));
+    assertEquals(1, Bytes.byteToInt((byte) 1));
+    assertEquals(2, Bytes.byteToInt((byte) 2));
+    assertEquals(13, Bytes.byteToInt((byte) 0x0d));
+    assertEquals(14, Bytes.byteToInt((byte) 0x0e));
+    assertEquals(15, Bytes.byteToInt((byte) 0x0f));
+    assertEquals(254, Bytes.byteToInt((byte) 0xfe));
+    assertEquals(255, Bytes.byteToInt((byte) 0xff));
+  }
+
+  @Test
+  public void twoBytesToInt() {
+    assertEquals(0, Bytes.twoBytesToInt(new byte[] {0x00, 0x00}));
+    assertEquals(1, Bytes.twoBytesToInt(new byte[] {0x00, 0x01}));
+    assertEquals(10, Bytes.twoBytesToInt(new byte[] {0x00, 0x0a}));
+    assertEquals(15, Bytes.twoBytesToInt(new byte[] {0x00, 0x0f}));
+    assertEquals(255, Bytes.twoBytesToInt(new byte[] {0x00, (byte)0xff}));
+
+    assertEquals(256, Bytes.twoBytesToInt(new byte[] {0x01, (byte)0x00}));
+    assertEquals(257, Bytes.twoBytesToInt(new byte[] {0x01, (byte)0x01}));
+
+    assertEquals(65534, Bytes.twoBytesToInt(new byte[] {(byte)0xff, (byte)0xfe}));
+    assertEquals(65535, Bytes.twoBytesToInt(new byte[] {(byte)0xff, (byte)0xff}));
+  }
+}
