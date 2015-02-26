@@ -84,7 +84,7 @@ public final class Message {
   }
 
   /**
-   * Gets the message method from the header message type. See
+   * Gets the message method from the header message type. See notes in
    * {@code #getMessageClass}.
    */
   public int getMessageMethod() {
@@ -93,5 +93,24 @@ public final class Message {
     return (((int)data[0] & 0x3e00) >> 2) | // M7-M11
         (((int)data[1] & 0xe0) >> 1) | // M4-M6
         (((int)data[1] & 0x0f)); // M0-M3
+  }
+
+  public int getMessageLength() {
+    return Bytes.twoBytesToInt(data[2], data[3]);
+  }
+
+  /**
+   * @see https://tools.ietf.org/html/rfc5389#section-6
+   *
+   * The magic cookie field MUST contain the fixed value 0x2112A442 in
+   * network byte order.  In RFC 3489 [RFC3489], this field was part of
+   * the transaction ID; placing the magic cookie in this location allows
+   * a server to detect if the client will understand certain attributes
+   * that were added in this revised specification.  In addition, it aids
+   * in distinguishing STUN packets from packets of other protocols when
+   * STUN is multiplexed with those other protocols on the same port.
+   */
+  public int getMagicCookie() {
+    return 0;
   }
 }

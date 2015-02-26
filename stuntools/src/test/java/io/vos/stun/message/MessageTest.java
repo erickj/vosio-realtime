@@ -123,4 +123,11 @@ public class MessageTest {
         hexToBytes("010300000000000000000000000000000000000000000000"));
     assertEquals(Messages.MESSAGE_METHOD_ALLOCATE, allocate.getMessageMethod());
   }
+
+  @Test
+  public void getMessageLength() {
+    Message message = new Message(
+        hexToBytes("010012bc0000000000000000000000000000000000000000"));
+    assertEquals(0x12bc, message.getMessageLength());
+  }
 }
