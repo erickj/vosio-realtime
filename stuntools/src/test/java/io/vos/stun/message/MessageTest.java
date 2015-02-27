@@ -10,7 +10,7 @@ import org.junit.Test;
 public class MessageTest {
 
   /** @see https://tools.ietf.org/html/rfc5769#section-2.1 */
-  private static final String REQUEST_HEX_2_1_BYTES =
+  private static final String EXAMPLE_REQUEST_1 =
       "000100582112a442b7e7a701bc34d686fa87dfae802200105354554e" +
       "207465737420636c69656e74002400046e0001ff80290008932ff9b1" +
       "51263b36000600096576746a3a68367659202020000800149aeaa70c" +
@@ -129,5 +129,15 @@ public class MessageTest {
     Message message = new Message(
         hexToBytes("010012bc0000000000000000000000000000000000000000"));
     assertEquals(0x12bc, message.getMessageLength());
+  }
+
+  @Test
+  public void hasMagicCookie() {
+    Message msgWithCookie = new Message(hexToBytes(EXAMPLE_REQUEST_1));
+    assertTrue(msgWithCookie.hasMagicCookie());
+
+    Message msgWithoutCookie = new Message(
+        hexToBytes("000100000000000000000000000000000000000000000000"));
+    assertFalse(msgWithoutCookie.hasMagicCookie());
   }
 }

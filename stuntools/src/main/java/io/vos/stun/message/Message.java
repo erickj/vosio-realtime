@@ -110,7 +110,8 @@ public final class Message {
    * in distinguishing STUN packets from packets of other protocols when
    * STUN is multiplexed with those other protocols on the same port.
    */
-  public int getMagicCookie() {
-    return 0;
+  public boolean hasMagicCookie() {
+    return Bytes.fourBytesToInt(data[4], data[5], data[6], data[7]) ==
+        Messages.MAGIC_COOKIE_FIXED_VALUE;
   }
 }

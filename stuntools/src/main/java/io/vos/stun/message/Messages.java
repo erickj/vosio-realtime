@@ -7,6 +7,8 @@ public class Messages {
 
   private Messages() {}
 
+  public static final int MAGIC_COOKIE_FIXED_VALUE = 0x2112a442;
+
   public static final int MESSAGE_HEADER_LEN = 20;
 
   public static final int MESSAGE_CLASS_REQUEST = 0;
