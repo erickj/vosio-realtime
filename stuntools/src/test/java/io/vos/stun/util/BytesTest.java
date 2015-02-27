@@ -44,4 +44,34 @@ public class BytesTest {
     assertEquals(65534, Bytes.twoBytesToInt((byte)0xff, (byte)0xfe));
     assertEquals(65535, Bytes.twoBytesToInt((byte)0xff, (byte)0xff));
   }
+
+  @Test
+  public void fourBytesToInt() {
+    assertEquals(
+        0, Bytes.fourBytesToInt((byte)0x00, (byte)0x00, (byte)0x00, (byte)0x00));
+    assertEquals(
+        1, Bytes.fourBytesToInt((byte)0x00, (byte)0x00, (byte)0x00, (byte)0x01));
+    assertEquals(
+        15, Bytes.fourBytesToInt((byte)0x00, (byte)0x00, (byte)0x00, (byte)0x0f));
+
+    assertEquals(256,
+        Bytes.fourBytesToInt((byte)0x00, (byte)0x00, (byte)0x01, (byte)0x00));
+    assertEquals(65535,
+        Bytes.fourBytesToInt((byte)0x00, (byte)0x00, (byte)0xff, (byte)0xff));
+
+    assertEquals(65536,
+        Bytes.fourBytesToInt((byte)0x00, (byte)0x01, (byte)0x00, (byte)0x00));
+    assertEquals(16777215,
+        Bytes.fourBytesToInt((byte)0x00, (byte)0xff, (byte)0xff, (byte)0xff));
+
+    assertEquals(16777216,
+        Bytes.fourBytesToInt((byte)0x01, (byte)0x00, (byte)0x00, (byte)0x00));
+    assertEquals(2147483647,
+        Bytes.fourBytesToInt((byte)0x7f, (byte)0xff, (byte)0xff, (byte)0xff));
+
+    assertEquals(-2147483648,
+        Bytes.fourBytesToInt((byte)0x80, (byte)0x00, (byte)0x00, (byte)0x00));
+    assertEquals(-1,
+        Bytes.fourBytesToInt((byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff));
+  }
 }

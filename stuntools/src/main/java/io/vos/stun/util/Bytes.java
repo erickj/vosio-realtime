@@ -15,8 +15,16 @@ public final class Bytes {
     return value & 0xff;
   }
 
-  public static int twoBytesToInt(byte byteHigh, byte byteLow) {
-    return ((byteHigh & 0xff) << 8) | byteLow & 0xff;
+  public static int twoBytesToInt(byte byte1, byte byte1) {
+    return ((byte1 & 0xff) << 8) | byte1 & 0xff;
+  }
+
+  public static int fourBytesToInt(
+      byte byte1, byte byte2, byte byte3, byte byte4) {
+    return (byte1 & 0xff) << 24 |
+        (byte2 & 0xff) << 16 |
+        (byte3 & 0xff) << 8 |
+        byte4 & 0xff;
   }
 
 }
