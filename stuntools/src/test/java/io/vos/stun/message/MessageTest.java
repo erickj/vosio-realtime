@@ -3,16 +3,10 @@ package io.vos.stun.message;
 import static io.vos.stun.testing.Messages.*;
 import static org.junit.Assert.*;
 
-import com.google.common.io.BaseEncoding;
-
 import org.junit.Before;
 import org.junit.Test;
 
 public class MessageTest {
-
-  private static byte[] hexToBytes(String hex) {
-    return BaseEncoding.base16().lowerCase().decode(hex);
-  }
 
   @Test
   public void constructorValidatesMinByteArraySize() {

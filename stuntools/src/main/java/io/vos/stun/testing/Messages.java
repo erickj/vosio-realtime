@@ -1,6 +1,12 @@
 package io.vos.stun.testing;
 
-public class Messages {
+import com.google.common.io.BaseEncoding;
+
+public final class Messages {
+
+  public static byte[] hexToBytes(String hex) {
+    return BaseEncoding.base16().lowerCase().decode(hex);
+  }
 
   /**
    * {@see https://tools.ietf.org/html/rfc5769#section-2.1}
