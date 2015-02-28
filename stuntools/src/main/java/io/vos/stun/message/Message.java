@@ -95,6 +95,14 @@ public final class Message {
         (((int)data[1] & 0x0f)); // M0-M3
   }
 
+  /**
+   * @see https://tools.ietf.org/html/rfc5389#section-6
+   *
+   * The message length MUST contain the size, in bytes, of the message
+   * not including the 20-byte STUN header.  Since all STUN attributes are
+   * padded to a multiple of 4 bytes, the last 2 bits of this field are
+   * always zero.
+   */
   public int getMessageLength() {
     return Bytes.twoBytesToInt(data[2], data[3]);
   }
@@ -114,4 +122,26 @@ public final class Message {
     return Bytes.fourBytesToInt(data[4], data[5], data[6], data[7]) ==
         Messages.MAGIC_COOKIE_FIXED_VALUE;
   }
+
+  /**
+   * @see https://tools.ietf.org/html/rfc5389#section-6
+   *
+   * The transaction ID is a 96-bit identifier, used to uniquely identify
+   * STUN transactions.  For request/response transactions, the
+   * transaction ID is chosen by the STUN client for the request and
+   * echoed by the server in the response.  For indications, it is chosen
+   * by the agent sending the indication.  It primarily serves to
+   * correlate requests with responses, though it also plays a small role
+   * in helping to prevent certain types of attacks.  The server also uses
+   * the transaction ID as a key to identify each transaction uniquely
+   * across all clients.  As such, the transaction ID MUST be uniformly
+   * and randomly chosen from the interval 0 .. 2**96-1, and SHOULD be
+   * cryptographically random.
+   */
+  public byte[] getTransactionId() {
+    byte[] id = new byte[12];
+    System.arraycopy(data, 8, id, 0, 12);
+    return id;
+  }
+
 }

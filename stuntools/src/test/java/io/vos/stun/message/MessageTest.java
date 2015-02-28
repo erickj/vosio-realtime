@@ -140,4 +140,15 @@ public class MessageTest {
         hexToBytes("000100000000000000000000000000000000000000000000"));
     assertFalse(msgWithoutCookie.hasMagicCookie());
   }
+
+  @Test
+  public void getTransactionId() {
+    byte[] expectedId = new byte[] {
+      (byte)0xb7, (byte)0xe7, (byte)0xa7, (byte)0x01,
+      (byte)0xbc, (byte)0x34, (byte)0xd6, (byte)0x86,
+      (byte)0xfa, (byte)0x87, (byte)0xdf, (byte)0xae
+    };
+    Message message = new Message(hexToBytes(EXAMPLE_REQUEST_1));
+    assertArrayEquals(expectedId, message.getTransactionId());
+  }
 }
