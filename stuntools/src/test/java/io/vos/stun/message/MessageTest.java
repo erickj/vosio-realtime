@@ -65,6 +65,31 @@ public class MessageTest {
   }
 
   @Test
+  public void hasNonZeroHeaderBits() throws Exception {
+    Message firstTwoBitsAreOne =
+        new Message(hexToBytes("c000000000000000000000000000000000000000"));
+    Message firstBitIsOne =
+        new Message(hexToBytes("8000000000000000000000000000000000000000"));
+    Message secondBitIsOne =
+        new Message(hexToBytes("4000000000000000000000000000000000000000"));
+
+    assertFalse(firstTwoBitsAreOne.hasNonZeroHeaderBits());
+    assertFalse(firstBitIsOne.hasNonZeroHeaderBits());
+    assertFalse(secondBitIsOne.hasNonZeroHeaderBits());
+
+    Message zeroBits1 =
+        new Message(hexToBytes("0000000000000000000000000000000000000000"));
+    Message zeroBits2 =
+        new Message(hexToBytes("1000000000000000000000000000000000000000"));
+    Message zeroBits3 =
+        new Message(hexToBytes("2000000000000000000000000000000000000000"));
+
+    assertTrue(zeroBits1.hasNonZeroHeaderBits());
+    assertTrue(zeroBits2.hasNonZeroHeaderBits());
+    assertTrue(zeroBits3.hasNonZeroHeaderBits());
+  }
+
+  @Test
   public void getMessageClass_request() {
     Message request = new Message(
         hexToBytes("000100000000000000000000000000000000000000000000"));

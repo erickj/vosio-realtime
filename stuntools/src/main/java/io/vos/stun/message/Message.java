@@ -57,6 +57,17 @@ public final class Message {
   }
 
   /**
+   * @see https://tools.ietf.org/html/rfc5389#section-6
+   *
+   * The most significant 2 bits of every STUN message MUST be zeroes.
+   * This can be used to differentiate STUN packets from other protocols
+   * when STUN is multiplexed with other protocols on the same port.
+   */
+  public boolean hasNonZeroHeaderBits() {
+    return data[0] >>> 6 == 0;
+  }
+
+  /**
    * Gets the message class from the header message type, from RFC 5389:
    * @see https://tools.ietf.org/html/rfc5389#section-6
    *
