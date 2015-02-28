@@ -3,6 +3,7 @@ package io.vos.stun.protocol;
 import io.vos.stun.message.Message;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
 
 import java.util.Map;
@@ -17,7 +18,9 @@ public class Agent implements MessageReceiver {
 
   private final Map<Integer, MethodProcessor> registeredMethodProcessors;
 
-  public AbstractAgent(Iterable<MethodProcessor> methodProcessors) {
+  public Agent(Iterable<MethodProcessor> methodProcessors) {
+    Preconditions.checkArgument(Iterables.size(methodProcessors) > 0);
+
     registeredMethodProcessors = Maps.<Integer, MethodProcessor>newHashMap();
     for (MethodProcessor p : methodProcessors) {
       int method = p.getMethod();
