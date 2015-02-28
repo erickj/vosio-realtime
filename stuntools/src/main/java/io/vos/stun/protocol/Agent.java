@@ -8,7 +8,7 @@ import com.google.common.collect.Maps;
 import java.util.Map;
 
 /**
- * An abstract STUN agent that follows the message processing rules described in
+ * A generic STUN agent that follows the message processing rules described in
  * RFC 5389.
  *
  * {@see https://tools.ietf.org/html/rfc5389#section-7.3}
