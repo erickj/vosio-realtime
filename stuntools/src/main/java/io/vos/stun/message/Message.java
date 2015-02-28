@@ -107,6 +107,10 @@ public final class Message {
     return Bytes.twoBytesToInt(data[2], data[3]);
   }
 
+  public boolean hasAttributes() {
+    return getMessageLength() > 0;
+  }
+
   /**
    * @see https://tools.ietf.org/html/rfc5389#section-6
    *

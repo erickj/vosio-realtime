@@ -1,5 +1,6 @@
 package io.vos.stun.message;
 
+import static io.vos.stun.testing.Messages.*;
 import static org.junit.Assert.*;
 
 import com.google.common.io.BaseEncoding;
@@ -8,17 +9,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 public class MessageTest {
-
-  /** @see https://tools.ietf.org/html/rfc5769#section-2.1 */
-  private static final String EXAMPLE_REQUEST_1 =
-      "000100582112a442b7e7a701bc34d686fa87dfae802200105354554e" +
-      "207465737420636c69656e74002400046e0001ff80290008932ff9b1" +
-      "51263b36000600096576746a3a68367659202020000800149aeaa70c" +
-      "bfd8cb56781ef2b5b2d3f249c1b571a280280004e57a3bcf";
-
-  @Before
-  public void setUp() {
-  }
 
   private static byte[] hexToBytes(String hex) {
     return BaseEncoding.base16().lowerCase().decode(hex);
@@ -133,7 +123,7 @@ public class MessageTest {
 
   @Test
   public void hasMagicCookie() {
-    Message msgWithCookie = new Message(hexToBytes(EXAMPLE_REQUEST_1));
+    Message msgWithCookie = new Message(hexToBytes(SAMPLE_REQUEST_1));
     assertTrue(msgWithCookie.hasMagicCookie());
 
     Message msgWithoutCookie = new Message(
@@ -148,7 +138,7 @@ public class MessageTest {
       (byte)0xbc, (byte)0x34, (byte)0xd6, (byte)0x86,
       (byte)0xfa, (byte)0x87, (byte)0xdf, (byte)0xae
     };
-    Message message = new Message(hexToBytes(EXAMPLE_REQUEST_1));
+    Message message = new Message(hexToBytes(SAMPLE_REQUEST_1));
     assertArrayEquals(expectedId, message.getTransactionId());
   }
 }
