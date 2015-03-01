@@ -89,7 +89,6 @@ public class AgentTest {
 
   private static class FakeMethodProcessor extends BaseMethodProcessor {
 
-    private final int[] supportedClasses;
     private Message processedRequest;
 
     FakeMethodProcessor(int method) {
@@ -97,8 +96,7 @@ public class AgentTest {
     }
 
     FakeMethodProcessor(int method, int[] supportedClasses) {
-      super(method);
-      this.supportedClasses = supportedClasses;
+      super(method, supportedClasses);
     }
 
     public Message getProcessedRequest() {
@@ -106,15 +104,9 @@ public class AgentTest {
     }
 
     @Override
-    public boolean isClassSupported(int methodClass) {
-      return Arrays.binarySearch(supportedClasses, methodClass) >= 0;
-    }
-
-    @Override
     public void processRequest(Message message) {
       processedRequest = message;
     }
   }
-
 
 }

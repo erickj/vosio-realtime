@@ -1,13 +1,21 @@
 package io.vos.stun.protocol;
 
+import static io.vos.stun.message.Messages.*;
+
 import io.vos.stun.message.Message;
+
+import com.google.common.base.Preconditions;
+
+import java.util.Arrays;
 
 public class BaseMethodProcessor implements MethodProcessor {
 
   private final int method;
+  private final int[] supportedClasses;
 
-  public BaseMethodProcessor(int method) {
+  public BaseMethodProcessor(int method, int[] supportedClasses) {
     this.method = method;
+    this.supportedClasses = Preconditions.checkNotNull(supportedClasses);
   }
 
   @Override
@@ -16,27 +24,35 @@ public class BaseMethodProcessor implements MethodProcessor {
   }
 
   @Override
-  public boolean isClassSupported(int messageClass) {
-    return false;
+  public boolean isClassSupported(int methodClass) {
+    return Arrays.binarySearch(supportedClasses, methodClass) >= 0;
   }
 
   @Override
   public void processRequest(Message message) {
-    throw new UnsupportedOperationException();
+    if (!isClassSupported(MESSAGE_CLASS_REQUEST)) {
+      throw new UnsupportedOperationException();
+    }
   }
 
   @Override
   public void processIndication(Message message) {
-    throw new UnsupportedOperationException();
+    if (!isClassSupported(MESSAGE_CLASS_INDICATION)) {
+      throw new UnsupportedOperationException();
+    }
   }
 
   @Override
   public void processResponse(Message message) {
-    throw new UnsupportedOperationException();
+    if (!isClassSupported(MESSAGE_CLASS_RESPONSE)) {
+      throw new UnsupportedOperationException();
+    }
   }
 
   @Override
   public void processError(Message message) {
-    throw new UnsupportedOperationException();
+    if (!isClassSupported(MESSAGE_CLASS_ERROR_RESPONSE)) {
+      throw new UnsupportedOperationException();
+    }
   }
 }
