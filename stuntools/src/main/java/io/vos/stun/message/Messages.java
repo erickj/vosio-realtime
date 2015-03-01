@@ -9,12 +9,20 @@ public class Messages {
 
   public static final int MAGIC_COOKIE_FIXED_VALUE = 0x2112a442;
 
-  /**
-   * Lengths of various message parts in bytes
-   */
-  public static final int MESSAGE_HEADER_LEN = 20;
-  public static final int MESSAGE_TRANSACTION_ID_LEN = 12;
+  /** Lengths of message header parts in bytes */
+  public static final int MESSAGE_LEN_HEADER = 20;
+  public static final int MESSAGE_LEN_TYPE = 2;
+  public static final int MESSAGE_LEN_LENGTH = 2;
+  public static final int MESSAGE_LEN_MAGIC_COOKIE = 4;
+  public static final int MESSAGE_LEN_TRANSACTION_ID = 12;
 
+  /** Start position of message header parts in bytes */
+  public static final int MESSAGE_POS_TYPE = 0;
+  public static final int MESSAGE_POS_LENGTH = 2;
+  public static final int MESSAGE_POS_MAGIC_COOKIE = 4;
+  public static final int MESSAGE_POS_TRANSACTION_ID = 8;
+
+  /** RFC 5389 message classes */
   public static final int MESSAGE_CLASS_REQUEST = 0;
   public static final int MESSAGE_CLASS_INDICATION = 1;
   public static final int MESSAGE_CLASS_RESPONSE = 2;

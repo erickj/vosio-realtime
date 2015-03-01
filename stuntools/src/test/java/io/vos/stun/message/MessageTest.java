@@ -184,4 +184,43 @@ public class MessageTest {
     Message message = new Message(hexToBytes(SAMPLE_REQUEST_1));
     assertArrayEquals(expectedId, message.getTransactionId());
   }
+
+  @Test
+  public void builderCreatesValidMessage_withAttributes() throws Exception {
+    Message.Builder builder = Message.builder();
+    byte[] transactionId = hexToBytes("deadbeeffeedd0d012345678");
+    byte[] attributes = hexToBytes("0123fedc");
+
+    Message message = builder
+        .setMessageClass(3)
+        .setMessageMethod(0xf0f)
+        .setTransactionId(transactionId)
+        .setAttributeBytes(attributes)
+        .build();
+
+    assertEquals(3, message.getMessageClass());
+    assertEquals(0xf0f, message.getMessageMethod());
+    assertTrue(message.hasMagicCookie());
+    assertEquals(4, message.getMessageLength());
+    assertArrayEquals(transactionId, message.getTransactionId());
+    assertArrayEquals(attributes, message.getAttributeBytes());
+  }
+
+  @Test
+  public void builderCreatesValidMessage_noAttributes() throws Exception {
+    Message.Builder builder = Message.builder();
+    byte[] transactionId = hexToBytes("deadbeeffeedd0d012345678");
+
+    Message message = builder
+        .setMessageClass(3)
+        .setMessageMethod(0xf0f)
+        .setTransactionId(transactionId)
+        .build();
+
+    assertEquals(3, message.getMessageClass());
+    assertEquals(0xf0f, message.getMessageMethod());
+    assertTrue(message.hasMagicCookie());
+    assertEquals(0, message.getMessageLength());
+    assertArrayEquals(transactionId, message.getTransactionId());
+  }
 }

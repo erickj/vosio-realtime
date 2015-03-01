@@ -40,21 +40,21 @@ public final class Message {
   private final byte[] data;
 
   public Message(byte[] data) {
-    Preconditions.checkArgument(data.length >= MESSAGE_HEADER_LEN);
+    Preconditions.checkArgument(data.length >= MESSAGE_LEN_HEADER);
     this.data = new byte[data.length];
     System.arraycopy(data, 0, this.data, 0, data.length);
   }
 
   public byte[] getHeaderBytes() {
-    byte[] headerBytes = new byte[MESSAGE_HEADER_LEN];
+    byte[] headerBytes = new byte[MESSAGE_LEN_HEADER];
     System.arraycopy(data, 0, headerBytes, 0, headerBytes.length);
     return headerBytes;
   }
 
   public byte[] getAttributeBytes() {
-    byte[] attrBytes = new byte[this.data.length - MESSAGE_HEADER_LEN];
+    byte[] attrBytes = new byte[this.data.length - MESSAGE_LEN_HEADER];
     System.arraycopy(
-        data, MESSAGE_HEADER_LEN, attrBytes, 0, attrBytes.length);
+        data, MESSAGE_LEN_HEADER, attrBytes, 0, attrBytes.length);
     return attrBytes;
   }
 
@@ -71,6 +71,13 @@ public final class Message {
 
   /**
    * Gets the message class from the header message type, from RFC 5389:
+   *
+   * Given the following message type:
+   *   0011 1110 1110 1111
+   *
+   * The first two bits are ALWAYS 0. After that all 1's represent method bits
+   * and 0's represent class bits.
+   *
    * @see https://tools.ietf.org/html/rfc5389#section-6
    *
    * The message type field is decomposed further into the following
@@ -156,8 +163,8 @@ public final class Message {
    * cryptographically random.
    */
   public byte[] getTransactionId() {
-    byte[] id = new byte[MESSAGE_TRANSACTION_ID_LEN];
-    System.arraycopy(data, 8, id, 0, MESSAGE_TRANSACTION_ID_LEN);
+    byte[] id = new byte[MESSAGE_LEN_TRANSACTION_ID];
+    System.arraycopy(data, 8, id, 0, MESSAGE_LEN_TRANSACTION_ID);
     return id;
   }
 
@@ -170,8 +177,8 @@ public final class Message {
     private int messageClass;
     private int messageMethod;
     private int length;
-    private byte[] attributes;
-    private byte[] transactionId;
+    private byte[] attributeBytes;
+    private byte[] transactionIdBytes;
 
     private Builder() {
       messageClass = 0;
@@ -179,12 +186,16 @@ public final class Message {
       length = 0;
     }
 
+    /** Sets the method and validates it is in the valid range 0 - 3 */
     public Builder setMessageClass(int messageClass) {
+      Preconditions.checkArgument(0 <= messageClass && messageClass <= 3);
       this.messageClass = messageClass;
       return this;
     }
 
+    /** Sets the method and validates it is in the valid range 0 - 0xfff */
     public Builder setMessageMethod(int messageMethod) {
+      Preconditions.checkArgument(0 <= messageMethod && messageMethod <= 0xfff);
       this.messageMethod = messageMethod;
       return this;
     }
@@ -195,11 +206,11 @@ public final class Message {
      * all attributes are padded to a multiple of 4 bytes, the attributes array
      * length is validatd as such.
      */
-    public Builder setAttributeBytes(byte[] attributes) {
-      int attributesLength = attributes.length;
+    public Builder setAttributeBytes(byte[] attributeBytes) {
+      int attributesLength = attributeBytes.length;
       Preconditions.checkArgument(attributesLength % 4 == 0);
-      this.attributes = new byte[attributesLength];
-      System.arraycopy(attributes, 0, this.attributes, 0, attributesLength);
+      this.attributeBytes = new byte[attributesLength];
+      System.arraycopy(attributeBytes, 0, this.attributeBytes, 0, attributesLength);
 
       this.length = attributesLength;
 
@@ -210,37 +221,73 @@ public final class Message {
      * Sets the transaction id. Validates the the length of the byte array is
      * the RFC 5839 defined size for transaction id, 12 bytes.
      */
-    public Builder setTransactionId(byte[] transactionId) {
-      Preconditions.checkArgument(transactionId.length == MESSAGE_TRANSACTION_ID_LEN);
-      this.transactionId = new byte[MESSAGE_TRANSACTION_ID_LEN];
-      System.arraycopy(transactionId, 0, this.transactionId, 0, MESSAGE_TRANSACTION_ID_LEN);
+    public Builder setTransactionId(byte[] transactionIdBytes) {
+      Preconditions.checkArgument(transactionIdBytes.length == MESSAGE_LEN_TRANSACTION_ID);
+      this.transactionIdBytes = new byte[MESSAGE_LEN_TRANSACTION_ID];
+      System.arraycopy(
+          transactionIdBytes, 0, this.transactionIdBytes, 0, MESSAGE_LEN_TRANSACTION_ID);
       return this;
     }
 
-    // public Message build() {
-    //   Preconditions.checkNotNull(transactionId);
-    //   byte[] messageBytes = MESSAGE_HEADER_LEN + length;
-    // }
+    /**
+     * Builds a new Message and discards all data set in the builder.
+     */
+    public Message build() {
+      Preconditions.checkNotNull(transactionIdBytes);
 
-    // 1000 0000 0x80
-    // 0100 0000 0x40
-    // 0010 0000 0x20
-    // 0001 0000 0x10
-    // 0000 1000 0x08
-    // 0000 0100 0x04
-    // 0000 0010 0x02
-    // 0000 0001 0x01
+      byte[] messageBytes = new byte[MESSAGE_LEN_HEADER + length];
 
-    // /**
-    //  * This is the opposite process of {@code #getMessageClass} and
-    //  * {@code #getMessageMethod}. Wish me luck.
-    //  */
-    // private int createMessageType() {
-    //   byte byte0 = 0x00 |
-    //       messageMethod & 0x20
-    //   byte byte1 = 0x00;
+      byte[] messageTypeBytes = createMessageType();
+      System.arraycopy(messageTypeBytes, 0, messageBytes, MESSAGE_POS_TYPE, MESSAGE_LEN_TYPE);
 
+      byte[] lengthBytes = Bytes.intToBytes(length);
+      System.arraycopy(lengthBytes, 2, messageBytes, MESSAGE_POS_LENGTH, MESSAGE_LEN_LENGTH);
 
-    // }
+      byte[] magicCookieBytes = Bytes.intToBytes(MAGIC_COOKIE_FIXED_VALUE);
+      System.arraycopy(
+          magicCookieBytes, 0, messageBytes, MESSAGE_POS_MAGIC_COOKIE, MESSAGE_LEN_MAGIC_COOKIE);
+
+      System.arraycopy(
+          transactionIdBytes, 0, messageBytes, MESSAGE_POS_TRANSACTION_ID,
+          MESSAGE_LEN_TRANSACTION_ID);
+      transactionIdBytes = null;
+
+      if (attributeBytes != null && attributeBytes.length > 0) {
+        System.arraycopy(
+            attributeBytes, 0, messageBytes, MESSAGE_LEN_HEADER, attributeBytes.length);
+        attributeBytes = null;
+      }
+
+      return new Message(messageBytes);
+    }
+
+    /**
+     * This is the opposite process of {@code #getMessageClass} and
+     * {@code #getMessageMethod}. Wish me luck.
+     *
+     * A message method is an int in the range 0 - 0xfff, so given the max
+     * value int:
+     *   00000000 00000000 00001111 11111111
+     *                         abcd efghijkl
+     *
+     * And given a message class with the range 0-3, so the max value int:
+     *   00000000 00000000 00000000 00000011
+     *                                    AB
+     *
+     * The message type to construct is a 16 bit value as follows:
+     *   00ab cdeA fghB ijkl
+     */
+    private byte[] createMessageType() {
+      byte byteHigh = (byte)(
+          ((messageMethod >>> 6) & 0x3e) | // `abcde` bits
+          ((messageClass >>> 1) & 0x01)); // `A` bit
+
+      byte byteLow = (byte)(
+          ((messageMethod << 1) & 0xe0) | // `fgh` bits
+          ((messageClass << 4) & 0x10) | // `B` bit
+          (messageMethod & 0x0f)); // `ijkl` bits
+
+      return new byte[] {byteHigh, byteLow};
+    }
   }
 }
