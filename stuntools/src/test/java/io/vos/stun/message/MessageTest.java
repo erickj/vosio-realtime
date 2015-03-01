@@ -119,6 +119,30 @@ public class MessageTest {
         Messages.MESSAGE_CLASS_ERROR_RESPONSE, errorResponse.getMessageClass());
   }
 
+  /**
+   * Tests the max method values in the RFC defined range 0x000 - 0xfff, with all message
+   * class bytes set to 0.
+   */
+  @Test
+  public void getMessageMethod_maxValue() {
+    // The message header bits are 0011 1110 1110 1111
+    Message max = new Message(
+        hexToBytes("3eef00000000000000000000000000000000000000000000"));
+    assertEquals(0xfff, max.getMessageMethod());
+  }
+
+  /**
+   * Tests the min method value in the RFC defined range 0x000 - 0xfff, with all message
+   * class bytes set to 1.
+   */
+  @Test
+  public void getMessageMethod_minValue() {
+    // The message header bits are 0000 0001 0001 0000
+    Message min = new Message(
+        hexToBytes("011000000000000000000000000000000000000000000000"));
+    assertEquals(0, min.getMessageMethod());
+  }
+
   @Test
   public void getMessageMethod_binding() {
     Message binding = new Message(

@@ -1,5 +1,7 @@
 package io.vos.stun.message;
 
+import static io.vos.stun.message.Messages.*;
+
 import io.vos.stun.util.Bytes;
 
 import com.google.common.base.Preconditions;
@@ -38,21 +40,21 @@ public final class Message {
   private final byte[] data;
 
   public Message(byte[] data) {
-    Preconditions.checkArgument(data.length >= Messages.MESSAGE_HEADER_LEN);
+    Preconditions.checkArgument(data.length >= MESSAGE_HEADER_LEN);
     this.data = new byte[data.length];
     System.arraycopy(data, 0, this.data, 0, data.length);
   }
 
   public byte[] getHeaderBytes() {
-    byte[] headerBytes = new byte[Messages.MESSAGE_HEADER_LEN];
+    byte[] headerBytes = new byte[MESSAGE_HEADER_LEN];
     System.arraycopy(data, 0, headerBytes, 0, headerBytes.length);
     return headerBytes;
   }
 
   public byte[] getAttributeBytes() {
-    byte[] attrBytes = new byte[this.data.length - Messages.MESSAGE_HEADER_LEN];
+    byte[] attrBytes = new byte[this.data.length - MESSAGE_HEADER_LEN];
     System.arraycopy(
-        data, Messages.MESSAGE_HEADER_LEN, attrBytes, 0, attrBytes.length);
+        data, MESSAGE_HEADER_LEN, attrBytes, 0, attrBytes.length);
     return attrBytes;
   }
 
@@ -101,7 +103,7 @@ public final class Message {
   public int getMessageMethod() {
     // Like its shitty cousin, the `method` is the 12 bit value (from lowest to
     // highest bit) constructed from the M0-M3 bits, M4-M6 bits, M7-M11 bits.
-    return (((int)data[0] & 0x3e00) >> 2) | // M7-M11
+    return (((int)data[0] & 0x3e) << 6) | // M7-M11
         (((int)data[1] & 0xe0) >> 1) | // M4-M6
         (((int)data[1] & 0x0f)); // M0-M3
   }
@@ -135,7 +137,7 @@ public final class Message {
    */
   public boolean hasMagicCookie() {
     return Bytes.fourBytesToInt(data[4], data[5], data[6], data[7]) ==
-        Messages.MAGIC_COOKIE_FIXED_VALUE;
+        MAGIC_COOKIE_FIXED_VALUE;
   }
 
   /**
@@ -154,9 +156,91 @@ public final class Message {
    * cryptographically random.
    */
   public byte[] getTransactionId() {
-    byte[] id = new byte[12];
-    System.arraycopy(data, 8, id, 0, 12);
+    byte[] id = new byte[MESSAGE_TRANSACTION_ID_LEN];
+    System.arraycopy(data, 8, id, 0, MESSAGE_TRANSACTION_ID_LEN);
     return id;
   }
 
+  public static Builder builder() {
+    return new Builder();
+  }
+
+  public static class Builder {
+
+    private int messageClass;
+    private int messageMethod;
+    private int length;
+    private byte[] attributes;
+    private byte[] transactionId;
+
+    private Builder() {
+      messageClass = 0;
+      messageMethod = 0;
+      length = 0;
+    }
+
+    public Builder setMessageClass(int messageClass) {
+      this.messageClass = messageClass;
+      return this;
+    }
+
+    public Builder setMessageMethod(int messageMethod) {
+      this.messageMethod = messageMethod;
+      return this;
+    }
+
+    /**
+     * Sets the bytes to be held in the message attributes, and sets the message
+     * length as computed from the length of the attribute bytes array. Since
+     * all attributes are padded to a multiple of 4 bytes, the attributes array
+     * length is validatd as such.
+     */
+    public Builder setAttributeBytes(byte[] attributes) {
+      int attributesLength = attributes.length;
+      Preconditions.checkArgument(attributesLength % 4 == 0);
+      this.attributes = new byte[attributesLength];
+      System.arraycopy(attributes, 0, this.attributes, 0, attributesLength);
+
+      this.length = attributesLength;
+
+      return this;
+    }
+
+    /**
+     * Sets the transaction id. Validates the the length of the byte array is
+     * the RFC 5839 defined size for transaction id, 12 bytes.
+     */
+    public Builder setTransactionId(byte[] transactionId) {
+      Preconditions.checkArgument(transactionId.length == MESSAGE_TRANSACTION_ID_LEN);
+      this.transactionId = new byte[MESSAGE_TRANSACTION_ID_LEN];
+      System.arraycopy(transactionId, 0, this.transactionId, 0, MESSAGE_TRANSACTION_ID_LEN);
+      return this;
+    }
+
+    // public Message build() {
+    //   Preconditions.checkNotNull(transactionId);
+    //   byte[] messageBytes = MESSAGE_HEADER_LEN + length;
+    // }
+
+    // 1000 0000 0x80
+    // 0100 0000 0x40
+    // 0010 0000 0x20
+    // 0001 0000 0x10
+    // 0000 1000 0x08
+    // 0000 0100 0x04
+    // 0000 0010 0x02
+    // 0000 0001 0x01
+
+    // /**
+    //  * This is the opposite process of {@code #getMessageClass} and
+    //  * {@code #getMessageMethod}. Wish me luck.
+    //  */
+    // private int createMessageType() {
+    //   byte byte0 = 0x00 |
+    //       messageMethod & 0x20
+    //   byte byte1 = 0x00;
+
+
+    // }
+  }
 }

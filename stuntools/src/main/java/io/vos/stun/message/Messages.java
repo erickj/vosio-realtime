@@ -9,7 +9,11 @@ public class Messages {
 
   public static final int MAGIC_COOKIE_FIXED_VALUE = 0x2112a442;
 
+  /**
+   * Lengths of various message parts in bytes
+   */
   public static final int MESSAGE_HEADER_LEN = 20;
+  public static final int MESSAGE_TRANSACTION_ID_LEN = 12;
 
   public static final int MESSAGE_CLASS_REQUEST = 0;
   public static final int MESSAGE_CLASS_INDICATION = 1;
