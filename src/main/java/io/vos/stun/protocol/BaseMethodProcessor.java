@@ -24,7 +24,7 @@ public class BaseMethodProcessor implements MethodProcessor {
   }
 
   @Override
-  public boolean isClassSupported(int methodClass) {
+  public final boolean isClassSupported(int methodClass) {
     return Arrays.binarySearch(supportedClasses, methodClass) >= 0;
   }
 
