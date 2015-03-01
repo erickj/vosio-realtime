@@ -36,11 +36,13 @@ public class AgentTest {
   }
 
   @Test
-  public void onMessage_passesValidationForAValidMethod() throws Exception {
+  public void onMessage_processesValidRequestMethod() throws Exception {
     Message validMessage = new Message(hexToBytes(SAMPLE_REQUEST_1));
     MethodProcessor proc = new FakeMethodProcessor(MESSAGE_METHOD_BINDING, new int[] {0});
     Agent agent = new Agent(Lists.newArrayList(proc));
     agent.onMessage(validMessage);
+
+    assertEquals(validMessage, ((FakeMethodProcessor)proc).getProcessedRequest());
   }
 
   @Test
@@ -88,6 +90,7 @@ public class AgentTest {
   private static class FakeMethodProcessor extends BaseMethodProcessor {
 
     private final int[] supportedClasses;
+    private Message processedRequest;
 
     FakeMethodProcessor(int method) {
       this(method, new int[] {});
@@ -98,13 +101,19 @@ public class AgentTest {
       this.supportedClasses = supportedClasses;
     }
 
+    public Message getProcessedRequest() {
+      return processedRequest;
+    }
+
     @Override
     public boolean isClassSupported(int methodClass) {
       return Arrays.binarySearch(supportedClasses, methodClass) >= 0;
     }
 
     @Override
-    public void processRequest(Message message) {}
+    public void processRequest(Message message) {
+      processedRequest = message;
+    }
   }
 
 
