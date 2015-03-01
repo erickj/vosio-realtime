@@ -19,8 +19,6 @@ public class Agent implements MessageReceiver {
   private final Map<Integer, MethodProcessor> registeredMethodProcessors;
 
   public Agent(Iterable<MethodProcessor> methodProcessors) {
-    Preconditions.checkArgument(Iterables.size(methodProcessors) > 0);
-
     registeredMethodProcessors = Maps.<Integer, MethodProcessor>newHashMap();
     for (MethodProcessor p : methodProcessors) {
       int method = p.getMethod();
@@ -35,10 +33,10 @@ public class Agent implements MessageReceiver {
   }
 
   private void validateMessage(Message message) throws ProtocolException {
-    byte[] headerBytes = message.getHeaderBytes();
-
-    if (headerBytes[0] != 0 || headerBytes[1] != 0) {
-      throw new ProtocolException(ProtocolException.ReasonCode.FIRST_TWO_BITS_NOT_ZERO);
+    if (!message.hasNonZeroHeaderBits()) {
+      byte[] headerBytes = message.getHeaderBytes();
+      String errorMsg = String.format("bit 0: %d, byte 1: %d", headerBytes[0], headerBytes[1]);
+      throw new ProtocolException(ProtocolException.ReasonCode.FIRST_TWO_BITS_NOT_ZERO, errorMsg);
     } else if (!message.hasMagicCookie()) {
       throw new ProtocolException(ProtocolException.ReasonCode.INVALID_MAGIC_COOKIE);
     }
