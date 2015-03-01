@@ -1,5 +1,7 @@
 package io.vos.stun.protocol;
 
+import static io.vos.stun.message.Messages.*;
+
 import io.vos.stun.message.Message;
 
 import com.google.common.base.Preconditions;
@@ -21,6 +23,7 @@ public class Agent implements MessageReceiver {
   public Agent(Iterable<MethodProcessor> methodProcessors) {
     registeredMethodProcessors = Maps.<Integer, MethodProcessor>newHashMap();
     for (MethodProcessor p : methodProcessors) {
+      Preconditions.checkNotNull(p);
       int method = p.getMethod();
       Preconditions.checkState(!registeredMethodProcessors.containsKey(method));
       registeredMethodProcessors.put(method, p);
@@ -29,7 +32,26 @@ public class Agent implements MessageReceiver {
 
   @Override
   public final void onMessage(Message message) throws ProtocolException {
-    validateMessage(message);
+    validateMessage(Preconditions.checkNotNull(message));
+
+    MethodProcessor proc =
+        Preconditions.checkNotNull(registeredMethodProcessors.get(message.getMessageMethod()));
+    switch (message.getMessageClass()) {
+      case MESSAGE_CLASS_REQUEST:
+        proc.processRequest(message);
+        return;
+      case MESSAGE_CLASS_INDICATION:
+        proc.processIndication(message);
+        return;
+      case MESSAGE_CLASS_RESPONSE:
+        proc.processResponse(message);
+        return;
+      case MESSAGE_CLASS_ERROR_RESPONSE:
+        proc.processError(message);
+        return;
+      default:
+        throw new AssertionError("Handling invalid message class, this should have been validated");
+    }
   }
 
   private void validateMessage(Message message) throws ProtocolException {

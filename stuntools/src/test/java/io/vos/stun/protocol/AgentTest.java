@@ -1,5 +1,6 @@
 package io.vos.stun.protocol;
 
+import static io.vos.stun.message.Messages.*;
 import static io.vos.stun.testing.Messages.*;
 import static org.junit.Assert.*;
 
@@ -37,7 +38,7 @@ public class AgentTest {
   @Test
   public void onMessage_passesValidationForAValidMethod() throws Exception {
     Message validMessage = new Message(hexToBytes(SAMPLE_REQUEST_1));
-    MethodProcessor proc = new FakeMethodProcessor(1, new int[] {0});
+    MethodProcessor proc = new FakeMethodProcessor(MESSAGE_METHOD_BINDING, new int[] {0});
     Agent agent = new Agent(Lists.newArrayList(proc));
     agent.onMessage(validMessage);
   }
@@ -101,6 +102,9 @@ public class AgentTest {
     public boolean isClassSupported(int methodClass) {
       return Arrays.binarySearch(supportedClasses, methodClass) >= 0;
     }
+
+    @Override
+    public void processRequest(Message message) {}
   }
 
 
