@@ -26,6 +26,26 @@ public class MessageTest {
   }
 
   @Test
+  public void hashCodeAndEquals() {
+    byte[] bytes1 = hexToBytes("0000000000000000000000000000000000000000");
+    byte[] bytes2 = hexToBytes("1111111111111111111111111111111111111111");
+
+    Message message1 = new Message(bytes1);
+    Message message2 = new Message(bytes1);
+    Message message3 = new Message(bytes2);
+
+    assertEquals(message1.hashCode(), message1.hashCode());
+    assertEquals(message1.hashCode(), message2.hashCode());
+    assertNotEquals(message1.hashCode(), message3.hashCode());
+
+    assertEquals(message1, message1);
+    assertEquals(message1, message2);
+    assertNotEquals(message1, message3);
+    assertNotEquals(message1, null);
+    assertNotEquals(message1, new Object());
+  }
+
+  @Test
   public void getHeaderBytes() {
     Message m = new Message(
         hexToBytes("000102030405060708090a0b0c0d0e0f1011121314151617"));

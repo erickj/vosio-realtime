@@ -4,7 +4,11 @@ import static io.vos.stun.message.Messages.*;
 
 import io.vos.stun.util.Bytes;
 
+import com.google.common.base.MoreObjects;
 import com.google.common.base.Preconditions;
+
+import java.util.Arrays;
+import java.util.Objects;
 
 /**
  * @see https://tools.ietf.org/html/rfc5389#section-6
@@ -168,6 +172,21 @@ public final class Message {
     return id;
   }
 
+  @Override
+  public int hashCode() {
+    return Arrays.hashCode(data);
+  }
+
+  @Override
+  public boolean equals(Object other) {
+    if (other == null || !(other instanceof Message)) {
+      return false;
+    } else if (this == other) {
+      return true;
+    }
+    return Arrays.equals(data, ((Message)other).data);
+  }
+
   public static Builder builder() {
     return new Builder();
   }
@@ -233,7 +252,7 @@ public final class Message {
      * Builds a new Message and discards all data set in the builder.
      */
     public Message build() {
-      Preconditions.checkNotNull(transactionIdBytes);
+      Objects.requireNonNull(transactionIdBytes);
 
       byte[] messageBytes = new byte[MESSAGE_LEN_HEADER + length];
 
