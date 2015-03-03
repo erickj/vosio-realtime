@@ -18,10 +18,10 @@ public interface MethodProcessor {
   /**
    * Processes the given message. Throws a runtime exception for any message
    * with a method other than that returned by {@code #getMethod}, or if a
-   * request is not supported for the method, as returned by
-   * {@code isClassSupported}.
+   * request is not supported for the method, as returned by {@code
+   * isClassSupported}. The return {@code Message} will be used as the response.
    */
-  void processRequest(Message message);
+  Message processRequest(Message message);
 
   /**
    * Processes the given message. Throws a runtime exception for any message

@@ -34,21 +34,27 @@ public class Agent implements MessageReceiver {
   public final void onMessage(Message message) throws ProtocolException {
     validateMessage(Preconditions.checkNotNull(message));
 
+    // TODO: this is where method authentication would go, since this is just
+    // meant to be used as a basic server now I'll skip it. In the future to
+    // support auth methods w/ database lookups, etc this class should be
+    // refactored to have an onAuthenticatedMessage method, where the processing
+    // code below would go.
+
     MethodProcessor proc =
         Preconditions.checkNotNull(registeredMethodProcessors.get(message.getMessageMethod()));
     switch (message.getMessageClass()) {
       case MESSAGE_CLASS_REQUEST:
-        proc.processRequest(message);
-        return;
+        Message response = proc.processRequest(message);
+        break;
       case MESSAGE_CLASS_INDICATION:
         proc.processIndication(message);
-        return;
+        break;
       case MESSAGE_CLASS_RESPONSE:
         proc.processResponse(message);
-        return;
+        break;
       case MESSAGE_CLASS_ERROR_RESPONSE:
         proc.processError(message);
-        return;
+        break;
       default:
         throw new AssertionError("Handling invalid message class, this should have been validated");
     }

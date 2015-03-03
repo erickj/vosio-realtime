@@ -29,10 +29,11 @@ public class BaseMethodProcessor implements MethodProcessor {
   }
 
   @Override
-  public void processRequest(Message message) {
+  public Message processRequest(Message message) {
     if (!isClassSupported(MESSAGE_CLASS_REQUEST)) {
       throw new UnsupportedOperationException();
     }
+    return new Message(new byte[] {});
   }
 
   @Override

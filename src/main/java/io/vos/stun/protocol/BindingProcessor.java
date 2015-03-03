@@ -11,6 +11,7 @@ public final class BindingProcessor extends BaseMethodProcessor {
   }
 
   @Override
-  public void processRequest(Message message) {
+  public Message processRequest(Message message) {
+    return new Message(new byte[] {});
   }
 }

@@ -6,6 +6,7 @@ import static org.junit.Assert.*;
 
 import io.vos.stun.message.Message;
 import io.vos.stun.protocol.ProtocolException.ReasonCode;
+import io.vos.stun.testing.FakeMethodProcessor;
 
 import com.google.common.collect.Lists;
 
@@ -86,27 +87,4 @@ public class AgentTest {
       assertEquals(ReasonCode.UNSUPPORTED_CLASS_FOR_METHOD, expected.getReasonCode());
     }
   }
-
-  private static class FakeMethodProcessor extends BaseMethodProcessor {
-
-    private Message processedRequest;
-
-    FakeMethodProcessor(int method) {
-      this(method, new int[] {});
-    }
-
-    FakeMethodProcessor(int method, int[] supportedClasses) {
-      super(method, supportedClasses);
-    }
-
-    public Message getProcessedRequest() {
-      return processedRequest;
-    }
-
-    @Override
-    public void processRequest(Message message) {
-      processedRequest = message;
-    }
-  }
-
 }
