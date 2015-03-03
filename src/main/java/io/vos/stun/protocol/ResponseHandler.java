@@ -1,6 +1,6 @@
 package io.vos.stun.protocol;
 
-public interface ResponseReceiver {
+public interface ResponseHandler {
 
   void onResponse(byte[] messageData);
 

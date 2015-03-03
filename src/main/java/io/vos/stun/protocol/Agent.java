@@ -16,7 +16,7 @@ import java.util.Map;
  *
  * {@see https://tools.ietf.org/html/rfc5389#section-7.3}
  */
-public class Agent implements MessageReceiver {
+public class Agent implements MessageHandler {
 
   private final Map<Integer, MethodProcessor> registeredMethodProcessors;
 
@@ -31,7 +31,7 @@ public class Agent implements MessageReceiver {
   }
 
   @Override
-  public final void onMessage(byte[] messageData, ResponseReceiver responseReceiver)
+  public final void onMessage(byte[] messageData, ResponseHandler responseHandler)
       throws ProtocolException {
     Message message = new Message(Preconditions.checkNotNull(messageData));
     validateMessage(message);

@@ -1,8 +1,8 @@
 package io.vos.stun.testing;
 
-import io.vos.stun.protocol.ResponseReceiver;
+import io.vos.stun.protocol.ResponseHandler;
 
-public final class FakeResponseReceiver implements ResponseReceiver {
+public final class FakeResponseHandler implements ResponseHandler {
 
   byte[] messageData;
 

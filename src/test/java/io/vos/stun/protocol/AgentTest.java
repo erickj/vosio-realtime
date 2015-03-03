@@ -7,7 +7,7 @@ import static org.junit.Assert.*;
 import io.vos.stun.message.Message;
 import io.vos.stun.protocol.ProtocolException.ReasonCode;
 import io.vos.stun.testing.FakeMethodProcessor;
-import io.vos.stun.testing.FakeResponseReceiver;
+import io.vos.stun.testing.FakeResponseHandler;
 
 import com.google.common.collect.Lists;
 
@@ -24,11 +24,11 @@ public class AgentTest {
   private static final int FAKE_METHOD_2 = Integer.MIN_VALUE;
   private static final List<MethodProcessor> EMPTY_METHOD_PROCESSOR_LIST = new ArrayList<>();
 
-  private ResponseReceiver responseReceiver;
+  private ResponseHandler responseHandler;
 
   @Before
   public void setUp() {
-    responseReceiver = new FakeResponseReceiver();
+    responseHandler = new FakeResponseHandler();
   }
 
   @Test
@@ -48,7 +48,7 @@ public class AgentTest {
     Message expectedMessage = new Message(messageBytes);
     MethodProcessor proc = new FakeMethodProcessor(MESSAGE_METHOD_BINDING, new int[] {0});
     Agent agent = new Agent(Lists.newArrayList(proc));
-    agent.onMessage(messageBytes, responseReceiver);
+    agent.onMessage(messageBytes, responseHandler);
 
     assertEquals(expectedMessage, ((FakeMethodProcessor)proc).getProcessedRequest());
   }
@@ -60,7 +60,7 @@ public class AgentTest {
     nonZeroBits[0] = (byte)0x80;
 
     try {
-      agent.onMessage(nonZeroBits, responseReceiver);
+      agent.onMessage(nonZeroBits, responseHandler);
       fail("Should have thrown a ProtocolException");
     } catch (ProtocolException expected) {
       assertEquals(ReasonCode.FIRST_TWO_BITS_NOT_ZERO, expected.getReasonCode());
@@ -73,7 +73,7 @@ public class AgentTest {
     byte[] bindingMessageBytes = hexToBytes(SAMPLE_REQUEST_1);
 
     try {
-      agent.onMessage(bindingMessageBytes, responseReceiver);
+      agent.onMessage(bindingMessageBytes, responseHandler);
       fail("Should have thrown a ProtocolException");
     } catch (ProtocolException expected) {
       assertEquals(ReasonCode.UNSUPPORTED_METHOD, expected.getReasonCode());
@@ -87,7 +87,7 @@ public class AgentTest {
     byte[] bindingMessageBytes = hexToBytes(SAMPLE_REQUEST_1);
 
     try {
-      agent.onMessage(bindingMessageBytes, responseReceiver);
+      agent.onMessage(bindingMessageBytes, responseHandler);
       fail("Should have thrown a ProtocolException");
     } catch (ProtocolException expected) {
       assertEquals(ReasonCode.UNSUPPORTED_CLASS_FOR_METHOD, expected.getReasonCode());
