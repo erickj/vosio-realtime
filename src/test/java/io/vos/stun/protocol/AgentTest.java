@@ -7,6 +7,7 @@ import static org.junit.Assert.*;
 import io.vos.stun.message.Message;
 import io.vos.stun.protocol.ProtocolException.ReasonCode;
 import io.vos.stun.testing.FakeMethodProcessor;
+import io.vos.stun.testing.FakeResponseReceiver;
 
 import com.google.common.collect.Lists;
 
@@ -14,16 +15,21 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.junit.Before;
 import org.junit.Test;
 
 public class AgentTest {
 
   private static final int FAKE_METHOD_1 = Integer.MAX_VALUE;
   private static final int FAKE_METHOD_2 = Integer.MIN_VALUE;
-
   private static final List<MethodProcessor> EMPTY_METHOD_PROCESSOR_LIST = new ArrayList<>();
 
-  private MethodProcessor fakeMethodProcessor;
+  private ResponseReceiver responseReceiver;
+
+  @Before
+  public void setUp() {
+    responseReceiver = new FakeResponseReceiver();
+  }
 
   @Test
   public void constructorThrowsOnDuplicateMethodProcessors() {
@@ -38,12 +44,13 @@ public class AgentTest {
 
   @Test
   public void onMessage_processesValidRequestMethod() throws Exception {
-    Message validMessage = new Message(hexToBytes(SAMPLE_REQUEST_1));
+    byte[] messageBytes = hexToBytes(SAMPLE_REQUEST_1);
+    Message expectedMessage = new Message(messageBytes);
     MethodProcessor proc = new FakeMethodProcessor(MESSAGE_METHOD_BINDING, new int[] {0});
     Agent agent = new Agent(Lists.newArrayList(proc));
-    agent.onMessage(validMessage);
+    agent.onMessage(messageBytes, responseReceiver);
 
-    assertEquals(validMessage, ((FakeMethodProcessor)proc).getProcessedRequest());
+    assertEquals(expectedMessage, ((FakeMethodProcessor)proc).getProcessedRequest());
   }
 
   @Test
@@ -52,9 +59,8 @@ public class AgentTest {
     byte[] nonZeroBits = hexToBytes(SAMPLE_REQUEST_1);
     nonZeroBits[0] = (byte)0x80;
 
-    Message nonZeroBitsMessage = new Message(nonZeroBits);
     try {
-      agent.onMessage(nonZeroBitsMessage);
+      agent.onMessage(nonZeroBits, responseReceiver);
       fail("Should have thrown a ProtocolException");
     } catch (ProtocolException expected) {
       assertEquals(ReasonCode.FIRST_TWO_BITS_NOT_ZERO, expected.getReasonCode());
@@ -64,10 +70,10 @@ public class AgentTest {
   @Test
   public void onMessage_validatesRegisteredMethods() throws Exception {
     Agent agent = new Agent(EMPTY_METHOD_PROCESSOR_LIST);
-    Message bindingMessage = new Message(hexToBytes(SAMPLE_REQUEST_1));
+    byte[] bindingMessageBytes = hexToBytes(SAMPLE_REQUEST_1);
 
     try {
-      agent.onMessage(bindingMessage);
+      agent.onMessage(bindingMessageBytes, responseReceiver);
       fail("Should have thrown a ProtocolException");
     } catch (ProtocolException expected) {
       assertEquals(ReasonCode.UNSUPPORTED_METHOD, expected.getReasonCode());
@@ -76,12 +82,12 @@ public class AgentTest {
 
   @Test
   public void onMessage_validatesMethodProcessorSupportsClass() throws Exception {
-    Message bindingMessage = new Message(hexToBytes(SAMPLE_REQUEST_1));
     MethodProcessor proc = new FakeMethodProcessor(1);
     Agent agent = new Agent(Lists.newArrayList(proc));
+    byte[] bindingMessageBytes = hexToBytes(SAMPLE_REQUEST_1);
 
     try {
-      agent.onMessage(bindingMessage);
+      agent.onMessage(bindingMessageBytes, responseReceiver);
       fail("Should have thrown a ProtocolException");
     } catch (ProtocolException expected) {
       assertEquals(ReasonCode.UNSUPPORTED_CLASS_FOR_METHOD, expected.getReasonCode());

@@ -31,8 +31,10 @@ public class Agent implements MessageReceiver {
   }
 
   @Override
-  public final void onMessage(Message message) throws ProtocolException {
-    validateMessage(Preconditions.checkNotNull(message));
+  public final void onMessage(byte[] messageData, ResponseReceiver responseReceiver)
+      throws ProtocolException {
+    Message message = new Message(Preconditions.checkNotNull(messageData));
+    validateMessage(message);
 
     // TODO: this is where method authentication would go, since this is just
     // meant to be used as a basic server now I'll skip it. In the future to
@@ -92,5 +94,4 @@ public class Agent implements MessageReceiver {
           ProtocolException.ReasonCode.UNSUPPORTED_CLASS_FOR_METHOD, errorMsg);
     }
   }
-
 }
