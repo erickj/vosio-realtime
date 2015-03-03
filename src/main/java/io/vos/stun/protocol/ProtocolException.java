@@ -6,7 +6,6 @@ public final class ProtocolException extends Exception {
 
   public enum ReasonCode  {
     FIRST_TWO_BITS_NOT_ZERO(ErrorCode.ERROR_400),
-    INVALID_MAGIC_COOKIE(ErrorCode.ERROR_400),
     INVALID_MESSAGE_LENGTH(ErrorCode.ERROR_400),
     UNSUPPORTED_METHOD(ErrorCode.ERROR_500),
     UNSUPPORTED_CLASS_FOR_METHOD(ErrorCode.ERROR_500);

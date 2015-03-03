@@ -67,8 +67,6 @@ public class Agent implements MessageHandler {
       byte[] headerBytes = message.getHeaderBytes();
       String errorMsg = String.format("bit 0: %d, byte 1: %d", headerBytes[0], headerBytes[1]);
       throw new ProtocolException(ProtocolException.ReasonCode.FIRST_TWO_BITS_NOT_ZERO, errorMsg);
-    } else if (!message.hasMagicCookie()) {
-      throw new ProtocolException(ProtocolException.ReasonCode.INVALID_MAGIC_COOKIE);
     }
 
     int msgLength = message.getMessageLength();
