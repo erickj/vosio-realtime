@@ -1,5 +1,11 @@
 package io.vos.stun.attribute;
 
+import com.google.common.base.Predicate;
+import com.google.common.collect.Iterables;
+
+import java.util.List;
+import javax.annotation.Nullable;
+
 /**
  * @see https://www.iana.org/assignments/stun-parameters/stun-parameters.txt
  */
@@ -28,6 +34,21 @@ public final class Attributes {
   public static final int ATTRIBUTE_SOFTWARE = 0x8022;
   public static final int ATTRIBUTE_ALTERNATE_SERVER = 0x8023;
   public static final int ATTRIBUTE_FINGERPRINT = 0x8028;
+
+  /**
+   * Returns the requested attribute type from the list of attributes or null if
+   * not found.
+   */
+  @Nullable
+  public static Attribute findAttributeByType(List<Attribute> attributes, final int type) {
+    Predicate<Attribute> compareTypePredicate = new Predicate<Attribute>() {
+        @Override
+        public boolean apply(Attribute attr) {
+          return attr.getType() == type;
+        }
+      };
+    return Iterables.find(attributes, compareTypePredicate, null);
+  }
 
   /**
    * Returns whether the given attribute type is in the comprehension-required
