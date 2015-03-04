@@ -1,11 +1,17 @@
 package io.vos.stun.testing;
 
+import io.vos.stun.message.Message;
+
 import com.google.common.io.BaseEncoding;
 
 public final class Messages {
 
-  public static byte[] hexToBytes(String hex) {
-    return BaseEncoding.base16().lowerCase().decode(hex);
+  public static byte[] hexToBytes(String hexString) {
+    return BaseEncoding.base16().lowerCase().decode(hexString);
+  }
+
+  public static Message createMessage(String hexString) {
+    return new Message(hexToBytes(hexString));
   }
 
   /**
@@ -46,4 +52,11 @@ public final class Messages {
       "80280004" + // FINGERPRINT attribute header
       "e57a3bcf";  // CRC32 fingerprint
 
+  /** No Attribute Message. */
+  public static final String NO_ATTRIBUTE_MESSAGE =
+      "00010058" + // Request type and message length
+      "2112a442" + // Magic cookie
+      "b7e7a701" + // }
+      "bc34d686" + // }  Transaction ID
+      "fa87dfae";  // }
 }
