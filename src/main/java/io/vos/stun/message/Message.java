@@ -195,6 +195,33 @@ public final class Message {
     return Arrays.equals(data, ((Message)other).data);
   }
 
+  /** Builds a success response for a request with the given attributes. */
+  public Message buildSuccessResponse(byte... responseAttrs) {
+    return buildResponse(true /* isSuccess */, responseAttrs);
+  }
+
+  /** Builds an error response for a request with the given attributes. */
+  public Message buildErrorResponse(byte... responseAttrs) {
+    return buildResponse(false /* isSuccess */, responseAttrs);
+  }
+
+  /**
+   * Builds a response to a request message. If this object is not a request a
+   * runtime exception will be thrown. The response will be filled in with this
+   * message's method and transaction id. The success or error response class
+   * will be determined by the {@code isSuccess} parameter. All attribute bytes
+   * passed in {@param responseAttrs} will be added to the response.
+   */
+  private Message buildResponse(boolean isSuccess, byte... responseAttrs) {
+    Preconditions.checkState(getMessageClass() == MESSAGE_CLASS_REQUEST);
+    return builder()
+        .setMessageClass(isSuccess ? MESSAGE_CLASS_RESPONSE : MESSAGE_CLASS_ERROR_RESPONSE)
+        .setMessageMethod(getMessageMethod())
+        .setTransactionId(getTransactionId())
+        .setAttributeBytes(responseAttrs)
+        .build();
+  }
+
   public static Builder builder() {
     return new Builder();
   }

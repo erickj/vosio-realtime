@@ -67,4 +67,12 @@ public final class Messages {
       "b7e7a701" + // }
       "bc34d686" + // }  Transaction ID
       "fa87dfae";  // }
+
+  /** A binding request with not attributes . */
+  public static final String EMPTY_BINDING_SUCCESS_RESPONSE =
+      "01010000" + // Request type and message length
+      "2112a442" + // Magic cookie
+      "b7e7a701" + // }
+      "bc34d686" + // }  Transaction ID
+      "fa87dfae";  // }
 }

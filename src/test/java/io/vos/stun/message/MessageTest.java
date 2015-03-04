@@ -254,4 +254,56 @@ public class MessageTest {
     assertEquals(0, message.getMessageLength());
     assertArrayEquals(transactionId, message.getTransactionId());
   }
+
+  @Test
+  public void buildResponse_throwsOnNonRequest() throws Exception {
+    Message bindingResponse = createMessage(EMPTY_BINDING_SUCCESS_RESPONSE);
+    try {
+      bindingResponse.buildSuccessResponse();
+      fail("Failed to throw exception on building a reply for a non-request");
+    } catch (IllegalStateException expected) {}
+  }
+
+  @Test
+  public void buildResponse_success() throws Exception {
+    Message bindingRequest = createMessage(EMPTY_BINDING_REQUEST);
+
+    Message bindingResponse = bindingRequest.buildSuccessResponse();
+    assertEquals(Messages.MESSAGE_CLASS_RESPONSE, bindingResponse.getMessageClass());
+    assertEquals(Messages.MESSAGE_METHOD_BINDING, bindingResponse.getMessageMethod());
+    assertEquals(0, bindingResponse.getMessageLength());
+    assertTrue(bindingResponse.hasMagicCookie());
+
+    assertEquals(12, bindingResponse.getTransactionId().length);
+    assertArrayEquals(bindingRequest.getTransactionId(), bindingResponse.getTransactionId());
+  }
+
+  @Test
+  public void buildResponse_error() throws Exception {
+    Message bindingRequest = createMessage(EMPTY_BINDING_REQUEST);
+
+    Message bindingResponse = bindingRequest.buildErrorResponse();
+    assertEquals(Messages.MESSAGE_CLASS_ERROR_RESPONSE, bindingResponse.getMessageClass());
+    assertEquals(Messages.MESSAGE_METHOD_BINDING, bindingResponse.getMessageMethod());
+    assertEquals(0, bindingResponse.getMessageLength());
+    assertTrue(bindingResponse.hasMagicCookie());
+
+    assertEquals(12, bindingResponse.getTransactionId().length);
+    assertArrayEquals(bindingRequest.getTransactionId(), bindingResponse.getTransactionId());
+  }
+
+  @Test
+  public void buildResponse_withAttributes() throws Exception {
+    Message bindingRequest = createMessage(EMPTY_BINDING_REQUEST);
+
+    byte[] responseAttrs = new byte[] {
+      0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08,
+      0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08,
+      0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08,
+      0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08
+    };
+    Message bindingResponse = bindingRequest.buildSuccessResponse(responseAttrs);
+    assertEquals(32, bindingResponse.getAttributeBytes().length);
+    assertArrayEquals(responseAttrs, bindingResponse.getAttributeBytes());
+  }
 }
