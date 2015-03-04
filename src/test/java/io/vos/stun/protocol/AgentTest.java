@@ -33,8 +33,8 @@ public class AgentTest {
 
   @Test
   public void constructorThrowsOnDuplicateMethodProcessors() {
-    MethodProcessor p1 = new FakeMethodProcessor(FAKE_METHOD_1);
-    MethodProcessor p2 = new FakeMethodProcessor(FAKE_METHOD_1);
+    MethodProcessor p1 = new FakeMethodProcessor(FAKE_METHOD_1, 1);
+    MethodProcessor p2 = new FakeMethodProcessor(FAKE_METHOD_1, 1);
 
     try {
       new Agent(Lists.newArrayList(p1, p2));
@@ -44,9 +44,10 @@ public class AgentTest {
 
   @Test
   public void onMessage_processesValidRequestMethod() throws Exception {
-    byte[] messageBytes = hexToBytes(SAMPLE_REQUEST_1);
+    byte[] messageBytes = hexToBytes(EMPTY_BINDING_REQUEST);
     Message expectedMessage = new Message(messageBytes);
-    MethodProcessor proc = new FakeMethodProcessor(MESSAGE_METHOD_BINDING, new int[] {0});
+    MethodProcessor proc =
+        new FakeMethodProcessor(MESSAGE_METHOD_BINDING, MESSAGE_CLASS_REQUEST);
     Agent agent = new Agent(Lists.newArrayList(proc));
     agent.onMessage(messageBytes, responseHandler);
 
@@ -82,7 +83,7 @@ public class AgentTest {
 
   @Test
   public void onMessage_validatesMethodProcessorSupportsClass() throws Exception {
-    MethodProcessor proc = new FakeMethodProcessor(1);
+    MethodProcessor proc = new FakeMethodProcessor(1, 99);
     Agent agent = new Agent(Lists.newArrayList(proc));
     byte[] bindingMessageBytes = hexToBytes(SAMPLE_REQUEST_1);
 

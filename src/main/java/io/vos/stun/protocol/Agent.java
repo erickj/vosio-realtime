@@ -2,10 +2,13 @@ package io.vos.stun.protocol;
 
 import static io.vos.stun.message.Messages.*;
 
+import io.vos.stun.attribute.Attribute;
+import io.vos.stun.attribute.Attributes;
+import io.vos.stun.attribute.AttributesDecoder;
+import io.vos.stun.attribute.RFC5389AttributeFactory;
 import io.vos.stun.message.Message;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
 
 import java.util.Map;
@@ -19,6 +22,7 @@ import java.util.Map;
 public class Agent implements MessageHandler {
 
   private final Map<Integer, MethodProcessor> registeredMethodProcessors;
+  private final AttributesDecoder attributeDecoder;
 
   public Agent(Iterable<MethodProcessor> methodProcessors) {
     registeredMethodProcessors = Maps.<Integer, MethodProcessor>newHashMap();
@@ -28,6 +32,8 @@ public class Agent implements MessageHandler {
       Preconditions.checkState(!registeredMethodProcessors.containsKey(method));
       registeredMethodProcessors.put(method, p);
     }
+
+    attributeDecoder = new AttributesDecoder(new RFC5389AttributeFactory());
   }
 
   @Override
@@ -35,6 +41,8 @@ public class Agent implements MessageHandler {
       throws ProtocolException {
     Message message = new Message(Preconditions.checkNotNull(messageData));
     validateMessage(message);
+
+    Iterable<Attribute> attributes = attributeDecoder.decodeMessageAttributes(message);
 
     // TODO: this is where method authentication would go, since this is just
     // meant to be used as a basic server now I'll skip it. In the future to
@@ -46,26 +54,31 @@ public class Agent implements MessageHandler {
         Preconditions.checkNotNull(registeredMethodProcessors.get(message.getMessageMethod()));
     switch (message.getMessageClass()) {
       case MESSAGE_CLASS_REQUEST:
-        Message response = proc.processRequest(message);
+        Message response = proc.processRequest(message, attributes);
         break;
       case MESSAGE_CLASS_INDICATION:
-        proc.processIndication(message);
+        proc.processIndication(message, attributes);
         break;
       case MESSAGE_CLASS_RESPONSE:
-        proc.processResponse(message);
+        proc.processResponse(message, attributes);
         break;
       case MESSAGE_CLASS_ERROR_RESPONSE:
-        proc.processError(message);
+        proc.processError(message, attributes);
         break;
       default:
         throw new AssertionError("Handling invalid message class, this should have been validated");
     }
   }
 
+  /**
+   * Validates the message according to RFC 5389. Throws a ProtocolException if the message is
+   * invalid.
+   */
   private void validateMessage(Message message) throws ProtocolException {
     if (!message.hasNonZeroHeaderBits()) {
       byte[] headerBytes = message.getHeaderBytes();
-      String errorMsg = String.format("bit 0: %d, byte 1: %d", headerBytes[0], headerBytes[1]);
+      String errorMsg = String.format(
+          "Expected two leading 0 bits, bit 0: %d, byte 1: %d", headerBytes[0], headerBytes[1]);
       throw new ProtocolException(ProtocolException.ReasonCode.FIRST_TWO_BITS_NOT_ZERO, errorMsg);
     }
 
