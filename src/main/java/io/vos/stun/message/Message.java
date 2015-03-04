@@ -49,6 +49,12 @@ public final class Message {
     System.arraycopy(data, 0, this.data, 0, data.length);
   }
 
+  public byte[] getBytes() {
+    byte[] bytes = new byte[data.length];
+    System.arraycopy(data, 0, bytes, 0, bytes.length);
+    return bytes;
+  }
+
   public byte[] getHeaderBytes() {
     byte[] headerBytes = new byte[MESSAGE_LEN_HEADER];
     System.arraycopy(data, 0, headerBytes, 0, headerBytes.length);

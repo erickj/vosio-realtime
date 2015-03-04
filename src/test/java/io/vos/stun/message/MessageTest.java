@@ -46,6 +46,15 @@ public class MessageTest {
   }
 
   @Test
+  public void getBytes() {
+    byte[] bytes = hexToBytes("000102030405060708090a0b0c0d0e0f1011121314151617");
+    Message m = new Message(bytes);
+    byte[] messageBytes = m.getBytes();
+    assertNotSame(bytes, messageBytes);
+    assertArrayEquals(bytes, messageBytes);
+  }
+
+  @Test
   public void getHeaderBytes() {
     Message m = new Message(
         hexToBytes("000102030405060708090a0b0c0d0e0f1011121314151617"));
