@@ -2,13 +2,16 @@ package io.vos.stun.attribute;
 
 import com.google.common.base.Preconditions;
 
-class BaseAttribute implements Attribute {
+import java.util.Arrays;
+import java.util.Objects;
+
+public class BaseAttribute implements Attribute {
 
   private final int type;
   private final int length;
   private final byte[] data;
 
-  BaseAttribute(int type, int length, byte[] data) {
+  public BaseAttribute(int type, int length, byte[] data) {
     Preconditions.checkArgument(type >= 0 && type <= 0xFFFF);
     Preconditions.checkNotNull(data);
     Preconditions.checkArgument(data.length % 4 == 0);
@@ -39,5 +42,23 @@ class BaseAttribute implements Attribute {
   @Override
   public final boolean isComprehensionRequired() {
     return Attributes.isComprehensionRequired(type);
+  }
+
+  @Override
+  public final int hashCode() {
+    return Objects.hash(type, length, Arrays.hashCode(data));
+  }
+
+  @Override
+  public final boolean equals(Object other) {
+    if (other == null || !(other instanceof Attribute)) {
+      return false;
+    } else if (this == other) {
+      return true;
+    }
+    Attribute attrOther = (Attribute) other;
+    return type == attrOther.getType()
+        && length == attrOther.getLength()
+        && Arrays.equals(data, attrOther.getValue());
   }
 }

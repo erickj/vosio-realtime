@@ -65,4 +65,32 @@ public class BaseAttributeTest {
     byte[] expectedData = new byte[] { fourByteData[0], fourByteData[1] };
     assertArrayEquals(expectedData, attr.getValue());
   }
+
+
+  @Test
+  public void hashCodeAndEquals() {
+    byte[] bytes1 = new byte[] { 0x01, 0x02, 0x03, 0x04 };
+    byte[] bytes2 = new byte[] { 0x05, 0x06, 0x07, 0x08 };
+
+    Attribute attr1 = new BaseAttribute(1, 4, bytes1);
+    Attribute attr2 = new BaseAttribute(1, 4, bytes1);
+    Attribute attr3 = new BaseAttribute(1, 4, bytes2);
+    Attribute attr4 = new BaseAttribute(2, 4, bytes1);
+    Attribute attr5 = new BaseAttribute(1, 2, bytes1);
+
+    assertEquals(attr1.hashCode(), attr1.hashCode());
+    assertEquals(attr1.hashCode(), attr2.hashCode());
+    assertNotEquals(attr1.hashCode(), attr3.hashCode());
+    assertNotEquals(attr1.hashCode(), attr4.hashCode());
+    assertNotEquals(attr1.hashCode(), attr5.hashCode());
+
+    assertEquals(attr1, attr1);
+    assertEquals(attr1, attr2);
+    assertNotEquals(attr1, attr3);
+    assertNotEquals(attr1, attr4);
+    assertNotEquals(attr1, attr5);
+    assertNotEquals(attr1, null);
+    assertNotEquals(attr1, new Object());
+  }
+
 }
