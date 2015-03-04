@@ -1,16 +1,13 @@
 package io.vos.stun.attribute;
 
+import io.vos.stun.message.Message;
 import io.vos.stun.protocol.ProtocolException;
-
-import javax.annotation.Nullable;
 
 public interface AttributeFactory {
 
   /**
-   * Creates the Attribute instance indicated by type. Returns null if the type
-   * is not supported or unknown.
+   * Creates the Attribute instance indicated by type.
    */
-  @Nullable
-  Attribute createAttribute(int type, int length, byte[] valueData);
+  Attribute createAttribute(int type, int length, byte[] valueData, Message message);
 
 }

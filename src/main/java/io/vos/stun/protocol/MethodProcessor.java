@@ -1,7 +1,11 @@
 package io.vos.stun.protocol;
 
+import io.vos.stun.attribute.Attribute;
 import io.vos.stun.message.Message;
 
+/**
+ * Implementations handle any/all message classes for a single method.
+ */
 public interface MethodProcessor {
 
   /** Returns the int value of the method, as defined by IANA. */
@@ -21,7 +25,8 @@ public interface MethodProcessor {
    * request is not supported for the method, as returned by {@code
    * isClassSupported}. The return {@code Message} will be used as the response.
    */
-  Message processRequest(Message message);
+  Message processRequest(Message message, Iterable<Attribute> attributes)
+      throws ProtocolException;
 
   /**
    * Processes the given message. Throws a runtime exception for any message
@@ -29,7 +34,7 @@ public interface MethodProcessor {
    * indication is not supported for the method, as returned by
    * {@code isClassSupported}.
    */
-  void processIndication(Message message);
+  void processIndication(Message message, Iterable<Attribute> attributes);
 
   /**
    * Processes the given message. Throws a runtime exception for any message
@@ -37,7 +42,7 @@ public interface MethodProcessor {
    * response is not supported for the method, as returned by
    * {@code isClassSupported}.
    */
-  void processResponse(Message message);
+  void processResponse(Message message, Iterable<Attribute> attributes);
 
   /**
    * Processes the given message. Throws a runtime exception for any message
@@ -45,6 +50,6 @@ public interface MethodProcessor {
    * error is not supported for the method, as returned by
    * {@code isClassSupported}.
    */
-  void processError(Message message);
+  void processError(Message message, Iterable<Attribute> attributes);
 
 }

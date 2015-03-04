@@ -195,6 +195,17 @@ public class MessageTest {
   }
 
   @Test
+  public void isRFC5389Message() {
+    // Same semantics as {@code #hasMagicCookie}
+    Message msgWithCookie = new Message(hexToBytes(SAMPLE_REQUEST_1));
+    assertTrue(msgWithCookie.isRFC5389Message());
+
+    Message msgWithoutCookie = new Message(
+        hexToBytes("000100000000000000000000000000000000000000000000"));
+    assertFalse(msgWithoutCookie.isRFC5389Message());
+  }
+
+  @Test
   public void getTransactionId() {
     byte[] expectedId = new byte[] {
       (byte)0xb7, (byte)0xe7, (byte)0xa7, (byte)0x01,

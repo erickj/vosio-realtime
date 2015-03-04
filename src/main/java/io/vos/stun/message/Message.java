@@ -152,6 +152,14 @@ public final class Message {
   }
 
   /**
+   * Adding an explicit predicate for detecting legacy messages. See comment on
+   * {@code hasMagicCookie}.
+   */
+  public boolean isRFC5389Message() {
+    return hasMagicCookie();
+  }
+
+  /**
    * @see https://tools.ietf.org/html/rfc5389#section-6
    *
    * The transaction ID is a 96-bit identifier, used to uniquely identify

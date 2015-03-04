@@ -19,21 +19,25 @@ class BaseAttribute implements Attribute {
     System.arraycopy(data, 0, this.data, 0, length);
   }
 
+  @Override
   public final int getType() {
     return type;
   }
 
+  @Override
   public final int getLength() {
     return length;
   }
 
+  @Override
   public final byte[] getValue() {
     byte[] valueData = new byte[length];
     System.arraycopy(data, 0, valueData, 0, length);
     return valueData;
   }
 
-  public boolean isComprehensionRequired() {
+  @Override
+  public final boolean isComprehensionRequired() {
     return Attributes.isComprehensionRequired(type);
   }
 }

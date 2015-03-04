@@ -29,10 +29,6 @@ public final class Attributes {
   public static final int ATTRIBUTE_ALTERNATE_SERVER = 0x8023;
   public static final int ATTRIBUTE_FINGERPRINT = 0x8028;
 
-  /** MAPPED_ADDRESS Address Family */
-  public static final byte ADDRESS_FAMILY_IPV4 = 0x01;
-  public static final byte ADDRESS_FAMILY_IPV6 = 0x02;
-
   /**
    * Returns whether the given attribute type is in the comprehension-required
    * range. Throws a runtime-exception if the value of type is outside of the
@@ -44,5 +40,12 @@ public final class Attributes {
       throw new IllegalArgumentException(String.format(errorMsg, type));
     }
     return type <= 0x7fff;
+  }
+
+  /**
+   * Returns whether this implementation supports this given attribute.
+   */
+  public static boolean isUnknownAttribute(Attribute attr) {
+    return attr instanceof UnsupportedAttribute;
   }
 }
