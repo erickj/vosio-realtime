@@ -3,7 +3,6 @@ package io.vos.stun.attribute;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 
-import java.util.List;
 import javax.annotation.Nullable;
 
 /**
@@ -40,7 +39,7 @@ public final class Attributes {
    * not found.
    */
   @Nullable
-  public static Attribute findAttributeByType(List<Attribute> attributes, final int type) {
+  public static Attribute findAttributeByType(Iterable<Attribute> attributes, final int type) {
     Predicate<Attribute> compareTypePredicate = new Predicate<Attribute>() {
         @Override
         public boolean apply(Attribute attr) {
