@@ -11,9 +11,6 @@ import io.vos.stun.message.Message;
 import io.vos.stun.testing.FakeAttribute;
 import io.vos.stun.testing.Messages;
 
-import java.util.Arrays;
-import java.util.List;
-
 import org.junit.Before;
 import org.junit.Test;
 
@@ -44,17 +41,17 @@ public class AttributesDecoderTest {
     Message msgNoAttrs = Messages.createMessage(SAMPLE_REQUEST_1);
 
     AttributesDecoder decoder = new AttributesDecoder(attrFactory);
-    List<Attribute> attrList = decoder.decodeMessageAttributes(msgNoAttrs);
-    assertEquals(6, attrList.size());
+    AttributesCollection attrCollection = decoder.decodeMessageAttributes(msgNoAttrs);
+    assertEquals(6, attrCollection.size());
 
-    assertEquals(ATTRIBUTE_SOFTWARE, attrList.get(0).getType());
-    assertEquals(16, attrList.get(0).getLength());
-    assertEquals("STUN test client", new String(attrList.get(0).getValue(), "UTF-8"));
+    Attribute softwareAttr = attrCollection.getFirstAttributeOfType(ATTRIBUTE_SOFTWARE);
+    assertEquals(16, softwareAttr.getLength());
+    assertEquals("STUN test client", new String(softwareAttr.getValue(), "UTF-8"));
 
-    assertEquals(ATTRIBUTE_USERNAME, attrList.get(3).getType());
-    assertEquals(9, attrList.get(3).getLength());
-    assertEquals("evtj:h6vY", new String(attrList.get(3).getValue(), "UTF-8"));
+    Attribute usernameAttr = attrCollection.getFirstAttributeOfType(ATTRIBUTE_USERNAME);
+    assertEquals(9, usernameAttr.getLength());
+    assertEquals("evtj:h6vY", new String(usernameAttr.getValue(), "UTF-8"));
 
-    assertEquals(ATTRIBUTE_FINGERPRINT, attrList.get(5).getType());
+    assertNotNull(attrCollection.getFirstAttributeOfType(ATTRIBUTE_FINGERPRINT));
   }
 }

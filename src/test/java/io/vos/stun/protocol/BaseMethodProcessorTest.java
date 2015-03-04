@@ -12,11 +12,24 @@ import io.vos.stun.testing.FakeMethodProcessor;
 
 import com.google.common.collect.Lists;
 
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.net.UnknownHostException;
 import java.util.List;
 
 import org.junit.Test;
 
 public class BaseMethodProcessorTest {
+
+  private static final InetSocketAddress INET_SOCKET = createInetSocketAddress();
+
+  private static InetSocketAddress createInetSocketAddress() {
+    try {
+      return new InetSocketAddress(InetAddress.getByName("20.40.80.160"), 54321);
+    } catch (UnknownHostException e) {
+      throw new Error(e);
+    }
+  }
 
   @Test
   public void constructorThrowsForEmptySupportedClassesList() {
@@ -50,7 +63,7 @@ public class BaseMethodProcessorTest {
         .createAttribute(ATTRIBUTE_RESERVED, 0, new byte[] {}, message));
     MethodProcessor methodProcessor = new BaseMethodProcessor(100, MESSAGE_CLASS_REQUEST);
     try {
-      methodProcessor.processRequest(message, unsupportedAttrList);
+      methodProcessor.processRequest(new RequestContext(message, unsupportedAttrList, INET_SOCKET));
       fail("Failed to catch expected ProtocolException");
     } catch (ProtocolException expected) {
       assertEquals(ProtocolException.ReasonCode.UNKNOWN_ATTRIBUTE, expected.getReasonCode());
@@ -62,7 +75,8 @@ public class BaseMethodProcessorTest {
     Message message = new Message(hexToBytes(SAMPLE_REQUEST_1));
     FakeMethodProcessor methodProcessor = new FakeMethodProcessor(99, MESSAGE_CLASS_REQUEST);
 
-    methodProcessor.processRequest(message, Lists.<Attribute>newArrayList());
+    methodProcessor.processRequest(
+        new RequestContext(message, Lists.<Attribute>newArrayList(), INET_SOCKET));
     assertEquals(message, methodProcessor.getProcessedRequest());
   }
 }

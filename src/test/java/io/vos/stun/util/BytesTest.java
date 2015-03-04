@@ -74,4 +74,17 @@ public class BytesTest {
     assertEquals(-1,
         Bytes.fourBytesToInt((byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff));
   }
+
+  @Test
+  public void padTo4ByteBoundary_onBoundary() {
+    byte[] fourByteArray = new byte[] { 0x01, 0x02, 0x03, 0x04 };
+    assertSame(fourByteArray, Bytes.padTo4ByteBoundary(fourByteArray));
+  }
+
+  @Test
+  public void padTo4ByteBoundary_offBoundary() {
+    byte[] twoByteArray = new byte[] { 0x01, 0x02 };
+    byte[] expectedArray = new byte[] { 0x01, 0x02, 0x00, 0x00 };
+    assertArrayEquals(expectedArray, Bytes.padTo4ByteBoundary(twoByteArray));
+  }
 }

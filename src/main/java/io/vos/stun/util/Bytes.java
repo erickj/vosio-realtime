@@ -27,4 +27,15 @@ public final class Bytes {
         byte4 & 0xff;
   }
 
+  public static byte[] padTo4ByteBoundary(byte[] data) {
+    int remainder = data.length % 4;
+    if (remainder % 4 == 0) {
+      return data;
+    }
+    byte[] padding = new byte[remainder];
+    for (int i = 0; i < remainder; i++) {
+      padding[i] = 0x00;
+    }
+    return com.google.common.primitives.Bytes.concat(data, padding);
+  }
 }

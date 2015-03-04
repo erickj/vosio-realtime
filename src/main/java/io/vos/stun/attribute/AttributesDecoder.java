@@ -30,8 +30,6 @@ import java.util.Objects;
  */
 public final class AttributesDecoder {
 
-  private static final List<Attribute> EMPTY_ATTR_LIST = ImmutableList.of();
-
   private final AttributeFactory attributeFactory;
 
   public AttributesDecoder(AttributeFactory attributeFactory) {
@@ -41,15 +39,15 @@ public final class AttributesDecoder {
   /**
    * Returns an immutable list of parsed attributes.
    */
-  public List<Attribute> decodeMessageAttributes(Message message) {
+  public AttributesCollection decodeMessageAttributes(Message message) {
     if (!message.hasAttributes()) {
-      return EMPTY_ATTR_LIST;
+      return AttributesCollection.EMPTY_COLLECTION;
     }
 
     byte[] attributeData = message.getAttributeBytes();
 
     Preconditions.checkState(attributeData.length % 4 == 0);
-    ImmutableList.Builder<Attribute> attributeBuilder = ImmutableList.builder();
+    AttributesCollection.Builder attrCollectionBuilder = AttributesCollection.builder();
 
     int currentByte = 0;
     while (currentByte < attributeData.length - 1) {
@@ -66,9 +64,10 @@ public final class AttributesDecoder {
         valueData = new byte[0];
       }
 
-      attributeBuilder.add(attributeFactory.createAttribute(type, length, valueData, message));
+      attrCollectionBuilder
+          .addAttribute(attributeFactory.createAttribute(type, length, valueData, message));
     }
-    return attributeBuilder.build();
+    return attrCollectionBuilder.build();
   }
 
   private static int getPaddedLength(int length) {

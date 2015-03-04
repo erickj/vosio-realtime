@@ -23,7 +23,7 @@ public class AttributesTest {
     AttributesDecoder decoder = new AttributesDecoder(attrFactory);
     Message msg = createMessage(SAMPLE_REQUEST_1);
 
-    List<Attribute> attrs = decoder.decodeMessageAttributes(msg);
+    Iterable<Attribute> attrs = decoder.decodeMessageAttributes(msg);
     assertNull(Attributes.findAttributeByType(attrs, Attributes.ATTRIBUTE_MAPPED_ADDRESS));
     assertNotNull(Attributes.findAttributeByType(attrs, Attributes.ATTRIBUTE_SOFTWARE));
   }

@@ -2,6 +2,8 @@ package io.vos.stun.attribute;
 
 import static org.junit.Assert.*;
 
+import com.google.common.primitives.Bytes;
+
 import org.junit.Before;
 import org.junit.Test;
 
@@ -50,6 +52,24 @@ public class BaseAttributeTest {
   public void getLength() {
     Attribute attr = new BaseAttribute(255, 4, fourByteData);
     assertEquals(4, attr.getLength());
+  }
+
+  @Test
+  public void getTotalLength() {
+    Attribute attr = new BaseAttribute(255, 4, fourByteData);
+    assertEquals(8, attr.getTotalLength());
+
+    Attribute attr2 = new BaseAttribute(1, 2, new byte[] {
+        0x00, 0x04, 0x00, 0x00,
+      });
+    assertEquals(8, attr2.getTotalLength());
+  }
+
+  @Test
+  public void toByteArray() {
+    Attribute attr = new BaseAttribute(255, 4, fourByteData);
+    byte[] expectedBytes = Bytes.concat(new byte[] { 0x00, (byte)0xff, 0x00, 0x04}, fourByteData);
+    assertArrayEquals(expectedBytes, attr.toByteArray());
   }
 
   @Test

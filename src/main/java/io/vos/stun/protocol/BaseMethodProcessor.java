@@ -52,7 +52,7 @@ public class BaseMethodProcessor implements MethodProcessor {
    * Called after attributes are validated in {@code #processRequest}. Override
    * in a subclass.
    */
-  protected Message processRequestInternal(Message message, Iterable<Attribute> attributes) {
+  protected byte[] processRequestInternal(RequestContext requestContext) {
     throw new UnsupportedOperationException();
   }
 
@@ -75,8 +75,7 @@ public class BaseMethodProcessor implements MethodProcessor {
   protected void processErrorInternal(Message message, Iterable<Attribute> attributes) {}
 
   @Override
-  public Message processRequest(Message message, Iterable<Attribute> attributes)
-      throws ProtocolException {
+  public byte[] processRequest(RequestContext requestContext) throws ProtocolException {
     if (!isClassSupported(MESSAGE_CLASS_REQUEST)) {
       throw new UnsupportedOperationException();
     }
@@ -87,14 +86,14 @@ public class BaseMethodProcessor implements MethodProcessor {
     // code of 420 (Unknown Attribute), and includes an UNKNOWN-ATTRIBUTES
     // attribute in the response that lists the unknown comprehension-
     // required attributes.
-    List<Integer> unknownAttributeTypes = findUnknownAttributeTypes(attributes);
+    List<Integer> unknownAttributeTypes = findUnknownAttributeTypes(requestContext.getAttributes());
     if (unknownAttributeTypes.size() > 0) {
       String errorMsg = String.format(
           "Unknown required attribute types %s", Joiner.on(",").join(unknownAttributeTypes));
       throw new ProtocolException(ProtocolException.ReasonCode.UNKNOWN_ATTRIBUTE, errorMsg);
     }
 
-    return processRequestInternal(message, attributes);
+    return processRequestInternal(requestContext);
   }
 
   @Override

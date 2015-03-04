@@ -11,6 +11,9 @@ import io.vos.stun.testing.FakeResponseHandler;
 
 import com.google.common.collect.Lists;
 
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -23,6 +26,15 @@ public class AgentTest {
   private static final int FAKE_METHOD_1 = Integer.MAX_VALUE;
   private static final int FAKE_METHOD_2 = Integer.MIN_VALUE;
   private static final List<MethodProcessor> EMPTY_METHOD_PROCESSOR_LIST = new ArrayList<>();
+  private static final InetSocketAddress INET_SOCKET = createInetSocketAddress();
+
+  private static InetSocketAddress createInetSocketAddress() {
+    try {
+      return new InetSocketAddress(InetAddress.getByName("20.40.80.160"), 54321);
+    } catch (UnknownHostException e) {
+      throw new Error(e);
+    }
+  }
 
   private ResponseHandler responseHandler;
 
@@ -49,7 +61,7 @@ public class AgentTest {
     MethodProcessor proc =
         new FakeMethodProcessor(MESSAGE_METHOD_BINDING, MESSAGE_CLASS_REQUEST);
     Agent agent = new Agent(Lists.newArrayList(proc));
-    agent.onMessage(messageBytes, responseHandler);
+    agent.onMessage(messageBytes, INET_SOCKET, responseHandler);
 
     assertEquals(expectedMessage, ((FakeMethodProcessor)proc).getProcessedRequest());
   }
@@ -61,7 +73,7 @@ public class AgentTest {
     nonZeroBits[0] = (byte)0x80;
 
     try {
-      agent.onMessage(nonZeroBits, responseHandler);
+      agent.onMessage(nonZeroBits, INET_SOCKET, responseHandler);
       fail("Should have thrown a ProtocolException");
     } catch (ProtocolException expected) {
       assertEquals(ReasonCode.FIRST_TWO_BITS_NOT_ZERO, expected.getReasonCode());
@@ -74,7 +86,7 @@ public class AgentTest {
     byte[] bindingMessageBytes = hexToBytes(SAMPLE_REQUEST_1);
 
     try {
-      agent.onMessage(bindingMessageBytes, responseHandler);
+      agent.onMessage(bindingMessageBytes, INET_SOCKET, responseHandler);
       fail("Should have thrown a ProtocolException");
     } catch (ProtocolException expected) {
       assertEquals(ReasonCode.UNSUPPORTED_METHOD, expected.getReasonCode());
@@ -88,7 +100,7 @@ public class AgentTest {
     byte[] bindingMessageBytes = hexToBytes(SAMPLE_REQUEST_1);
 
     try {
-      agent.onMessage(bindingMessageBytes, responseHandler);
+      agent.onMessage(bindingMessageBytes, INET_SOCKET, responseHandler);
       fail("Should have thrown a ProtocolException");
     } catch (ProtocolException expected) {
       assertEquals(ReasonCode.UNSUPPORTED_CLASS_FOR_METHOD, expected.getReasonCode());

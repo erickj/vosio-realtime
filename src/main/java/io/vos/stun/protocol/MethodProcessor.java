@@ -20,13 +20,13 @@ public interface MethodProcessor {
   boolean isClassSupported(int messageClass);
 
   /**
-   * Processes the given message. Throws a runtime exception for any message
-   * with a method other than that returned by {@code #getMethod}, or if a
-   * request is not supported for the method, as returned by {@code
-   * isClassSupported}. The return {@code Message} will be used as the response.
+   * Processes the message in the RequestContext. Throws a runtime exception for
+   * any message with a method other than that returned by {@code #getMethod},
+   * or if a request is not supported for the method, as returned by {@code
+   * isClassSupported}. Any exception will generate an error response. The
+   * return attribute bytes to use in the success response.
    */
-  Message processRequest(Message message, Iterable<Attribute> attributes)
-      throws ProtocolException;
+  byte[] processRequest(RequestContext requestContext) throws ProtocolException;
 
   /**
    * Processes the given message. Throws a runtime exception for any message

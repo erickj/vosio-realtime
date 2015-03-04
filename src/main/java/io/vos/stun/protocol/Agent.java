@@ -4,6 +4,7 @@ import static io.vos.stun.message.Messages.*;
 
 import io.vos.stun.attribute.Attribute;
 import io.vos.stun.attribute.Attributes;
+import io.vos.stun.attribute.AttributesCollection;
 import io.vos.stun.attribute.AttributesDecoder;
 import io.vos.stun.attribute.RFC5389AttributeFactory;
 import io.vos.stun.message.Message;
@@ -11,6 +12,7 @@ import io.vos.stun.message.Message;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
 
+import java.net.InetSocketAddress;
 import java.util.Map;
 
 /**
@@ -37,12 +39,13 @@ public class Agent implements MessageHandler {
   }
 
   @Override
-  public final void onMessage(byte[] messageData, ResponseHandler responseHandler)
+  public final void onMessage(
+      byte[] messageData, InetSocketAddress remoteAddress, ResponseHandler responseHandler)
       throws ProtocolException {
     Message message = new Message(Preconditions.checkNotNull(messageData));
     validateMessage(message);
 
-    Iterable<Attribute> attributes = attributeDecoder.decodeMessageAttributes(message);
+    AttributesCollection attributes = attributeDecoder.decodeMessageAttributes(message);
 
     // TODO: this is where method authentication would go, since this is just
     // meant to be used as a basic server now I'll skip it. In the future to
@@ -54,7 +57,8 @@ public class Agent implements MessageHandler {
         Preconditions.checkNotNull(registeredMethodProcessors.get(message.getMessageMethod()));
     switch (message.getMessageClass()) {
       case MESSAGE_CLASS_REQUEST:
-        Message response = proc.processRequest(message, attributes);
+        byte[] responseAttributeBytes =
+            proc.processRequest(new RequestContext(message, attributes, remoteAddress));
         break;
       case MESSAGE_CLASS_INDICATION:
         proc.processIndication(message, attributes);

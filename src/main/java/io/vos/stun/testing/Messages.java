@@ -31,8 +31,8 @@ public final class Messages {
       "fa87dfae" + // }
       "80220010" + // SOFTWARE attribute header
       "5354554e" + // }
-      "20746573" + // }  User-agent...
-      "7420636c" + // }  ...name
+      "20746573" + // }  "STUN test client"
+      "7420636c" + // }
       "69656e74" + // }
       "00240004" + // PRIORITY attribute header
       "6e0001ff" + // ICE priority value
@@ -68,11 +68,35 @@ public final class Messages {
       "bc34d686" + // }  Transaction ID
       "fa87dfae";  // }
 
-  /** A binding request with not attributes . */
+  /** A binding response with not attributes . */
   public static final String EMPTY_BINDING_SUCCESS_RESPONSE =
       "01010000" + // Request type and message length
       "2112a442" + // Magic cookie
       "b7e7a701" + // }
       "bc34d686" + // }  Transaction ID
       "fa87dfae";  // }
+
+
+  /** A message with multiple attributes of the same type. */
+  public static final String MESSAGE_DUPLICATE_ATTRIBUTES =
+      "0001007f" + // Request type and message length
+      "2112a442" + // Magic cookie
+      "b7e7a701" + // }
+      "bc34d686" + // }  Transaction ID
+      "fa87dfae" + // }
+      "80220010" + // SOFTWARE attribute header
+      "5354554e" + // }
+      "20746573" + // }  "STUN test client"
+      "7420636c" + // }
+      "69656e74" + // }
+      "80220010" + // SOFTWARE attribute header 2
+      "4a617661" + // }
+      "20535455" + // }  "JAVA test client"
+      "4e20636c" + // }
+      "69656e74" + // }
+      "80220010" + // SOFTWARE attribute header 3
+      "486f6d65" + // }
+      "20737765" + // }
+      "65742048" + // }
+      "6f6d65";    // }
 }

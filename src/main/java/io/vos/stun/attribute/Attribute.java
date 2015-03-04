@@ -14,11 +14,17 @@ public interface Attribute {
   /**
    * @see https://tools.ietf.org/html/rfc5389#section-15
    *
-   * Returns the length of the value as specified in the attribute bytes, note that all attributes
-   * are padded to a 32 bit boundary, so this is not the actual length of the byte array returned
-   * from {@code #getValue}.
+   * Returns the length of the value as specified in the attribute bytes, note
+   * that all attributes are padded to a 32 bit boundary, so this is not the
+   * actual length of the byte array returned from {@code #getValue}.
    */
   int getLength();
+
+  /**
+   * Gets the total length in bytes of the attribute, as it appears in the
+   * message, including the 2 byte type, 2 byte length, and value data.
+   */
+  int getTotalLength();
 
   /**
    * Returns the raw byte value portion of the data. This is variable length.
@@ -38,4 +44,9 @@ public interface Attribute {
    * can be ignored by the STUN agent if it does not understand them.
    */
   boolean isComprehensionRequired();
+
+  /**
+   * Gets the byte array representation of the attribute.
+   */
+  byte[] toByteArray();
 }
