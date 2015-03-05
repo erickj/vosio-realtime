@@ -3,8 +3,6 @@ package io.vos.stun.attribute;
 import static io.vos.stun.attribute.Attributes.*;
 
 import io.vos.stun.message.Message;
-import io.vos.stun.protocol.ProtocolException.ReasonCode;
-import io.vos.stun.protocol.ProtocolException;
 
 public final class RFC5389AttributeFactory implements AttributeFactory {
 

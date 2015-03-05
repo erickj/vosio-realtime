@@ -1,7 +1,7 @@
 package io.vos.stun.protocol;
 
 /** STUN Error Codes */
-public enum ErrorCode {
+enum ErrorCode {
                                                     // 0-299  Reserved
   ERROR_300(300, "Try Alternate"),                  // RFC5389
                                                     // 301-399 Unassigned

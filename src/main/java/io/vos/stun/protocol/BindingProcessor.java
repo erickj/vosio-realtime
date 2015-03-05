@@ -15,9 +15,9 @@ import java.net.Inet4Address;
 import java.net.Inet6Address;
 import java.net.InetSocketAddress;
 
-public final class BindingProcessor extends BaseMethodProcessor {
+final class BindingProcessor extends BaseMethodProcessor {
 
-  public BindingProcessor() {
+  BindingProcessor() {
     super(MESSAGE_METHOD_BINDING, MESSAGE_CLASS_REQUEST);
   }
 

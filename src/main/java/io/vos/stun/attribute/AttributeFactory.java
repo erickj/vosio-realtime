@@ -1,7 +1,6 @@
 package io.vos.stun.attribute;
 
 import io.vos.stun.message.Message;
-import io.vos.stun.protocol.ProtocolException;
 
 public interface AttributeFactory {
 
