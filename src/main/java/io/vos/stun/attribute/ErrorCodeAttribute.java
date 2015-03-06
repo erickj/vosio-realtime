@@ -34,16 +34,20 @@ import java.io.UnsupportedEncodingException;
  */
 public final class ErrorCodeAttribute extends BaseAttribute {
 
+  private static final int MIN_ERROR_CODE = 300;
+  private static final int MAX_ERROR_CODE = 699;
+
   ErrorCodeAttribute(int type, int length, byte[] valueData) {
     super(type, length, valueData);
   }
 
   private static byte[] PADDING = new byte[] {
-    0, 0
+    0x00, 0x00
   };
 
   public static ErrorCodeAttribute createAttribute(int errorCode, String reasonPhrase) {
-    Preconditions.checkArgument(errorCode >= 300 && errorCode < 700);
+    Preconditions.checkArgument(errorCode >= MIN_ERROR_CODE && errorCode <= MAX_ERROR_CODE);
+
     int errorClass = errorCode / 100;
     int errorNumber = errorCode % 100;
 
@@ -63,9 +67,6 @@ public final class ErrorCodeAttribute extends BaseAttribute {
     byte[] valueData = com.google.common.primitives.Bytes.concat(
         PADDING, errorClassBytes, errorNumberBytes,
         reasonPhraseBytes);
-    System.out.println("Value data length: " + valueData.length);
-    System.out.println(
-        "Value data length after padding: " + Bytes.padTo4ByteBoundary(valueData).length);
     return new ErrorCodeAttribute(
         ATTRIBUTE_ERROR_CODE, valueData.length, Bytes.padTo4ByteBoundary(valueData));
   }
