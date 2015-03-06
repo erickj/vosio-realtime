@@ -60,7 +60,7 @@ public class BaseMethodProcessorTest {
   public void processRequest_throwsProtocolException_onUnknownAttributes() {
     Message message = new Message(hexToBytes(SAMPLE_REQUEST_1));
     List<Attribute> unsupportedAttrList = Lists.newArrayList(new RFC5389AttributeFactory()
-        .createAttribute(ATTRIBUTE_RESERVED, 0, new byte[] {}, message));
+        .createAttribute(ATTRIBUTE_RESERVED, 0, new byte[] {}));
     MethodProcessor methodProcessor = new BaseMethodProcessor(100, MESSAGE_CLASS_REQUEST);
     try {
       methodProcessor.processRequest(new RequestContext(message, unsupportedAttrList, INET_SOCKET));

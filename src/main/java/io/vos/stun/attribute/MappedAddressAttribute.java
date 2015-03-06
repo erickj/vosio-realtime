@@ -44,14 +44,19 @@ public final class MappedAddressAttribute extends BaseAttribute {
 
     addressFamily = valueData[1];
     port = Bytes.twoBytesToInt(valueData[2], valueData[3]);
-
-    validateMappedAddressForAddressFamily();
     mappedAddress = new byte[mappedAddressByteLength()];
   }
 
-  private void validateMappedAddressForAddressFamily() {
-    int actualAddressByteLength = getLength() - 4; // subtract 4 bytes for the family/port
-    Preconditions.checkState(mappedAddressByteLength() == actualAddressByteLength);
+  @Override
+  protected void validateInternal(int type, int length, byte[] valueData) {
+    int wouldBeAddressFamily = valueData[1];
+    Preconditions.checkState(
+        wouldBeAddressFamily == AF_IPV4 || wouldBeAddressFamily == AF_IPV6,
+        "Invalid address family value " + wouldBeAddressFamily);
+
+    int expectedByteLength = wouldBeAddressFamily == AF_IPV4 ? 8 : 20;
+    Preconditions.checkState(valueData.length == expectedByteLength, String.format(
+        "Invalid value data length %d, expected %d", valueData.length, expectedByteLength));
   }
 
   private int mappedAddressByteLength() {
@@ -69,19 +74,20 @@ public final class MappedAddressAttribute extends BaseAttribute {
     return addressFamily == AF_IPV4;
   }
 
-  private static byte[] PADDING = new byte[] {
-    0, 0, 0, 0,
-    0, 0, 0, 0
-  };
-
   public static MappedAddressAttribute createAttribute(
-      byte[] port, byte[] address, boolean isXorMapped) {
-    int addressFamily = address.length == 4 ? AF_IPV4 : AF_IPV6;
-    byte[] valueData = com.google.common.primitives.Bytes.concat(
-          PADDING,
-          new byte[] { Bytes.intToBytes(addressFamily)[0] },
-          port,
-          address);
+      int addressFamily, byte[] port, byte[] address, boolean isXorMapped) {
+    Preconditions.checkArgument(addressFamily == AF_IPV4 || addressFamily == AF_IPV6);
+    Preconditions.checkArgument(port.length == 2);
+    if (addressFamily == AF_IPV4) {
+      Preconditions.checkArgument(address.length == 4);
+    } else {
+      Preconditions.checkArgument(address.length == 16);
+    }
+
+    byte[] valueData = Bytes.concat(
+        Bytes.intToBytes(addressFamily, 2 /* maxBytes */),
+        port,
+        address);
     return new MappedAddressAttribute(
         isXorMapped ? ATTRIBUTE_XOR_MAPPED_ADDRESS : ATTRIBUTE_MAPPED_ADDRESS,
         valueData.length,

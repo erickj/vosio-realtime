@@ -20,12 +20,19 @@ public class BaseAttribute implements Attribute {
         valueData.length % 4 == 0,
         String.format(
             "Attribute value data not on a mod-4 byte boundary, %d bytes", valueData.length));
+    validateInternal(type, length, valueData);
 
     this.type = type;
     this.length = length;
     this.valueData = new byte[valueData.length];
     System.arraycopy(valueData, 0, this.valueData, 0, length);
   }
+
+  /**
+   * Constructor validation hook, meant to be override by subclasses. The
+   * subclass MUST NOT modify the valueData array as it is being passed raw.
+   */
+  protected void validateInternal(int type, int length, byte[] valueData) {}
 
   @Override
   public final int getType() {

@@ -42,7 +42,11 @@ final class BindingProcessor extends BaseMethodProcessor {
     InetSocketAddress replyAddress = requestContext.getReplyAddress();
     byte[] portBytes = Bytes.intToBytes(replyAddress.getPort());
     byte[] addressBytes = replyAddress.getAddress().getAddress();
-    return MappedAddressAttribute.createAttribute(portBytes, addressBytes, false /* isXor */);
+    int addressFamily = addressBytes.length == 4
+        ? MappedAddressAttribute.AF_IPV4
+        : MappedAddressAttribute.AF_IPV6;
+    return MappedAddressAttribute.
+        createAttribute(addressFamily, portBytes, addressBytes, false /* isXor */);
   }
 
   private Attribute getXorMappedAddress(RequestContext requestContext) {
@@ -54,17 +58,17 @@ final class BindingProcessor extends BaseMethodProcessor {
       (byte)(portBytes[3] ^ magicCookieBytes[1])
     };
 
-    byte attributeAddressFamily;
+    byte addressFamily;
     byte[] addressBytes = replyAddress.getAddress().getAddress();
     byte[] xAddressBytes = new byte[addressBytes.length];
     byte[] xorBytes;
     if (replyAddress.getAddress() instanceof Inet4Address) {
       xorBytes = magicCookieBytes;
-      attributeAddressFamily = MappedAddressAttribute.AF_IPV4;
+      addressFamily = MappedAddressAttribute.AF_IPV4;
     } else if (replyAddress.getAddress() instanceof Inet6Address) {
       xorBytes = com.google.common.primitives.Bytes.concat(
           magicCookieBytes, requestContext.getMessage().getTransactionId());
-      attributeAddressFamily = MappedAddressAttribute.AF_IPV6;
+      addressFamily = MappedAddressAttribute.AF_IPV6;
     } else {
       throw new AssertionError("Should either have an IPv4 or IPv6 address");
     }
@@ -73,6 +77,7 @@ final class BindingProcessor extends BaseMethodProcessor {
       xAddressBytes[i] = (byte)(addressBytes[i] ^ xorBytes[i]);
     }
 
-    return MappedAddressAttribute.createAttribute(xPortBytes, xAddressBytes, true /* isXor */);
+    return MappedAddressAttribute
+        .createAttribute(addressFamily, xPortBytes, xAddressBytes, true /* isXor */);
   }
 }

@@ -16,7 +16,7 @@ public class AttributesTest {
   public void findAttributeByType() {
     AttributeFactory attrFactory = new AttributeFactory() {
         @Override
-        public Attribute createAttribute(int type, int length, byte[] valueData, Message m) {
+        public Attribute createAttribute(int type, int length, byte[] valueData) {
           return new FakeAttribute(type, length, valueData);
         }
       };

@@ -58,14 +58,16 @@ public final class AttributesDecoder {
       if (length > 0) {
         int paddedLength = getPaddedLength(length);
         valueData = new byte[paddedLength];
-        System.arraycopy(attributeData, currentByte, valueData, 0, paddedLength);
+        // we can just copy to length, because the valueData array is already
+        // initialized to 0 byte values
+        System.arraycopy(attributeData, currentByte, valueData, 0, length);
         currentByte += paddedLength;
       } else {
         valueData = new byte[0];
       }
 
       attrCollectionBuilder
-          .addAttribute(attributeFactory.createAttribute(type, length, valueData, message));
+          .addAttribute(attributeFactory.createAttribute(type, length, valueData));
     }
     return attrCollectionBuilder.build();
   }
