@@ -49,6 +49,11 @@ public final class Message {
     System.arraycopy(data, 0, this.data, 0, data.length);
   }
 
+  public static int lengthCheck(byte[] data) {
+    Preconditions.checkArgument(data.length >= 4);
+    return Bytes.twoBytesToInt(data[2], data[3]);
+  }
+
   public byte[] getBytes() {
     byte[] bytes = new byte[data.length];
     System.arraycopy(data, 0, bytes, 0, bytes.length);
@@ -135,6 +140,10 @@ public final class Message {
    */
   public int getMessageLength() {
     return Bytes.twoBytesToInt(data[2], data[3]);
+  }
+
+  public int getTotalMessageLength() {
+    return getMessageLength() + MESSAGE_LEN_HEADER;
   }
 
   public boolean hasAttributes() {

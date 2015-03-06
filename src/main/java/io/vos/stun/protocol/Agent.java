@@ -6,11 +6,14 @@ import io.vos.stun.attribute.Attribute;
 import io.vos.stun.attribute.Attributes;
 import io.vos.stun.attribute.AttributesCollection;
 import io.vos.stun.attribute.AttributesDecoder;
+import io.vos.stun.attribute.ErrorCodeAttribute;
 import io.vos.stun.attribute.RFC5389AttributeFactory;
 import io.vos.stun.message.Message;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.primitives.Bytes;
 
 import java.net.InetSocketAddress;
 import java.util.Map;
@@ -26,7 +29,7 @@ public class Agent implements MessageHandler {
   private final Map<Integer, MethodProcessor> registeredMethodProcessors;
   private final AttributesDecoder attributeDecoder;
 
-  public Agent(Iterable<MethodProcessor> methodProcessors) {
+  public Agent(Iterable<? extends MethodProcessor> methodProcessors) {
     registeredMethodProcessors = Maps.<Integer, MethodProcessor>newHashMap();
     for (MethodProcessor p : methodProcessors) {
       Preconditions.checkNotNull(p);
@@ -38,40 +41,61 @@ public class Agent implements MessageHandler {
     attributeDecoder = new AttributesDecoder(new RFC5389AttributeFactory());
   }
 
+  public final int totalBytesInMessage(byte[] tlvCheck) {
+    return Message.lengthCheck(tlvCheck);
+  }
+
   @Override
   public final void onMessage(
-      byte[] messageData, InetSocketAddress remoteAddress, ResponseHandler responseHandler)
-      throws ProtocolException {
-    Message message = new Message(Preconditions.checkNotNull(messageData));
-    validateMessage(message);
+      byte[] messageData, InetSocketAddress remoteAddress, ResponseHandler responseHandler) {
+    Message message = null;
+    try {
+      message = new Message(Preconditions.checkNotNull(messageData));
+      validateMessage(message);
 
-    AttributesCollection attributes = attributeDecoder.decodeMessageAttributes(message);
+      AttributesCollection attributes = attributeDecoder.decodeMessageAttributes(message);
 
-    // TODO: this is where method authentication would go, since this is just
-    // meant to be used as a basic server now I'll skip it. In the future to
-    // support auth methods w/ database lookups, etc this class should be
-    // refactored to have an onAuthenticatedMessage method, where the processing
-    // code below would go.
+      // TODO: this is where method authentication would go, since this is just
+      // meant to be used as a basic server now I'll skip it. In the future to
+      // support auth methods w/ database lookups, etc this class should be
+      // refactored to have an onAuthenticatedMessage method, where the processing
+      // code below would go.
 
-    MethodProcessor proc =
-        Preconditions.checkNotNull(registeredMethodProcessors.get(message.getMessageMethod()));
-    switch (message.getMessageClass()) {
-      case MESSAGE_CLASS_REQUEST:
-        byte[] responseAttributeBytes =
-            proc.processRequest(new RequestContext(message, attributes, remoteAddress));
-        break;
-      case MESSAGE_CLASS_INDICATION:
-        proc.processIndication(message, attributes);
-        break;
-      case MESSAGE_CLASS_RESPONSE:
-        proc.processResponse(message, attributes);
-        break;
-      case MESSAGE_CLASS_ERROR_RESPONSE:
-        proc.processError(message, attributes);
-        break;
-      default:
-        throw new AssertionError("Handling invalid message class, this should have been validated");
+      MethodProcessor proc =
+          Preconditions.checkNotNull(registeredMethodProcessors.get(message.getMessageMethod()));
+      switch (message.getMessageClass()) {
+        case MESSAGE_CLASS_REQUEST:
+          byte[] responseAttributeBytes =
+              proc.processRequest(new RequestContext(message, attributes, remoteAddress));
+          Message response = message.buildSuccessResponse(responseAttributeBytes);
+          responseHandler.onResponse(response.getBytes());
+          break;
+        case MESSAGE_CLASS_INDICATION:
+          proc.processIndication(message, attributes);
+          break;
+        case MESSAGE_CLASS_RESPONSE:
+          proc.processResponse(message, attributes);
+          break;
+        case MESSAGE_CLASS_ERROR_RESPONSE:
+          proc.processError(message, attributes);
+          break;
+        default:
+          throw new AssertionError("Handling invalid message class, this should have been validated");
+      }
+    } catch (ProtocolException e) {
+      if (message != null && message.getMessageClass() == MESSAGE_CLASS_REQUEST) {
+        responseHandler.onResponse(getErrorResponse(message, e.getReasonCode().getErrorCode()));
+      }
     }
+  }
+
+  private byte[] getErrorResponse(Message message, ErrorCode errorCode) {
+    ErrorCodeAttribute errorCodeAttr =
+        ErrorCodeAttribute.createAttribute(errorCode.getCode(), errorCode.getStatus());
+
+    Message errorMessage = message.buildErrorResponse(Bytes.concat(
+        message.getAttributeBytes(), errorCodeAttr.toByteArray()));
+    return errorMessage.getBytes();
   }
 
   /**
@@ -108,5 +132,9 @@ public class Agent implements MessageHandler {
       throw new ProtocolException(
           ProtocolException.ReasonCode.UNSUPPORTED_CLASS_FOR_METHOD, errorMsg);
     }
+  }
+
+  public static Agent createBasicServer() {
+    return new Agent(Lists.newArrayList(new BindingProcessor()));
   }
 }

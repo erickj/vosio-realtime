@@ -10,8 +10,10 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <version.findbugs>3.0.0</version.findbugs>
     <version.guava>18.0</version.guava>
     <version.junit>4.12</version.junit>
+    <version.slf4j-api>1.7.7</version.slf4j-api>
   </properties>
 
   <dependencies>
@@ -24,13 +26,19 @@
     <dependency>
       <groupId>com.google.code.findbugs</groupId>
       <artifactId>jsr305</artifactId>
-      <version>3.0.0</version>
+      <version>${version.findbugs}</version>
     </dependency>
     <dependency>
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
       <version>${version.guava}</version>
     </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+      <version>${version.slf4j-api}</version>
+    </dependency>
+
   </dependencies>
 
   <build>

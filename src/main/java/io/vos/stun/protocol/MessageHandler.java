@@ -5,7 +5,6 @@ import java.net.InetSocketAddress;
 public interface MessageHandler {
 
   void onMessage(
-      byte[] messageData, InetSocketAddress remoteAddress, ResponseHandler responseHandler)
-      throws ProtocolException;
+      byte[] messageData, InetSocketAddress remoteAddress, ResponseHandler responseHandler);
 
 }

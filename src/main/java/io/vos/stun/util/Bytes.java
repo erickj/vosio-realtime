@@ -32,7 +32,7 @@ public final class Bytes {
     if (remainder % 4 == 0) {
       return data;
     }
-    byte[] padding = new byte[remainder];
+    byte[] padding = new byte[4 - remainder];
     for (int i = 0; i < remainder; i++) {
       padding[i] = 0x00;
     }

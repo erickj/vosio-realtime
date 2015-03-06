@@ -17,7 +17,9 @@ public class BaseAttribute implements Attribute {
     Preconditions.checkArgument(type >= 0 && type <= 0xFFFF);
     Preconditions.checkNotNull(valueData);
     Preconditions.checkArgument(
-        valueData.length % 4 == 0, "Attribute value data not on a mod-4 byte boundary");
+        valueData.length % 4 == 0,
+        String.format(
+            "Attribute value data not on a mod-4 byte boundary, %d bytes", valueData.length));
 
     this.type = type;
     this.length = length;
