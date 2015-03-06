@@ -32,10 +32,9 @@ public final class Bytes {
     if (remainder % 4 == 0) {
       return data;
     }
-    byte[] padding = new byte[4 - remainder];
-    for (int i = 0; i < remainder; i++) {
-      padding[i] = 0x00;
-    }
-    return com.google.common.primitives.Bytes.concat(data, padding);
+    int padding = 4 - remainder;
+    byte[] paddedBuffer = new byte[data.length + padding];
+    System.arraycopy(data, 0, paddedBuffer, 0, data.length);
+    return paddedBuffer;
   }
 }

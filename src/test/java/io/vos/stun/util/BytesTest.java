@@ -83,8 +83,8 @@ public class BytesTest {
 
   @Test
   public void padTo4ByteBoundary_offBoundary() {
-    byte[] twoByteArray = new byte[] { 0x01, 0x02 };
-    byte[] expectedArray = new byte[] { 0x01, 0x02, 0x00, 0x00 };
+    byte[] twoByteArray = new byte[] { 0x01 };
+    byte[] expectedArray = new byte[] { 0x01, 0x00, 0x00, 0x00 };
     assertArrayEquals(expectedArray, Bytes.padTo4ByteBoundary(twoByteArray));
   }
 }
