@@ -2,13 +2,42 @@ package io.vos.stun.util;
 
 public final class Bytes {
 
+  /**
+   * Returns a 4-byte array representation of the int in network byte order (big
+   * endian).
+   */
   public static byte[] intToBytes(int value) {
-    return new byte[] {
-      (byte)((value >>> 24) & 0xff),
-      (byte)((value >>> 16) & 0xff),
-      (byte)((value >>> 8) & 0xff),
-      (byte)(value & 0xff)
-    };
+    return intToBytes(value, 4);
+  }
+
+  /**
+   * Returns the given int converted to the least significant {@code maxBytes}
+   * length byte array, in network byte order.
+   */
+  public static byte[] intToBytes(int value, int maxBytes) {
+    if (maxBytes == 1) {
+      return new byte[] { (byte)(value & 0xff) };
+    } else if (maxBytes == 2) {
+      return new byte[] {
+        (byte)((value >>> 8) & 0xff),
+        (byte)(value & 0xff)
+      };
+    } else if (maxBytes == 3) {
+      return new byte[] {
+        (byte)((value >>> 16) & 0xff),
+        (byte)((value >>> 8) & 0xff),
+        (byte)(value & 0xff)
+      };
+    } else if (maxBytes == 4) {
+      return new byte[] {
+        (byte)((value >>> 24) & 0xff),
+        (byte)((value >>> 16) & 0xff),
+        (byte)((value >>> 8) & 0xff),
+        (byte)(value & 0xff)
+      };
+    } else {
+      throw new IllegalArgumentException("Invalid max byte value " + maxBytes);
+    }
   }
 
   public static int byteToInt(byte value) {
@@ -36,5 +65,20 @@ public final class Bytes {
     byte[] paddedBuffer = new byte[data.length + padding];
     System.arraycopy(data, 0, paddedBuffer, 0, data.length);
     return paddedBuffer;
+  }
+
+  public static byte[] concat(byte[]... byteArrays) {
+    int newBytesLength = 0;
+    for (int i = 0; i < byteArrays.length; i++) {
+      newBytesLength += byteArrays[i].length;
+    }
+
+    byte[] newByteArray = new byte[newBytesLength];
+    int currentByte = 0;
+    for (int i = 0; i < byteArrays.length; i++) {
+      System.arraycopy(byteArrays[i], 0, newByteArray, currentByte, byteArrays[i].length);
+      currentByte += byteArrays[i].length;
+    }
+    return newByteArray;
   }
 }
